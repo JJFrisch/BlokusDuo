@@ -1,1 +1,1 @@
-# BlockusDuo
+# BlokusDuo
