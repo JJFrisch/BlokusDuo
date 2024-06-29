@@ -3,12 +3,7 @@ import copy
 
 board = Board(14)
 
-board.place(5, 5, 12, 1, 2) #the manual 2nd rotation of blokc '12'
-board.print()
-
-
-
-def rotate_(prev_orientation):
+def rotate_(prev_orientation): #JF
     new_o = []
     ne = []
     se = []
@@ -101,7 +96,7 @@ pieces = {
     ]
 }
 
-def generatePiecesDict(pieces_first_orientation):
+def generatePiecesDict(pieces_first_orientation): #JF
   to_return = {}
   for piece_num in pieces_first_orientation.keys():
     orientations = [pieces_first_orientation[piece_num][0]]
@@ -115,10 +110,13 @@ def generatePiecesDict(pieces_first_orientation):
   return to_return
 
 
-print(rotate_(pieces[12][0]))
+board.place(5, 5, 12, 1, 2) #the manual 2nd rotation of blokc '12'
+board.print()
+
+print(rotate_(pieces[12][0])) # to check the rotate_ function
 new_pieces = generatePiecesDict(pieces)
-print(new_pieces[12][1])
-print(new_pieces[1][1])
+print(new_pieces[12][1]) # to check the generatePiecesDict function
+print(new_pieces[1][1]) # to check the generatePiecesDict function
     
     
 
