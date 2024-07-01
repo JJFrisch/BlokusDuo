@@ -1,5 +1,5 @@
 # BlokusDuo
-### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, 
+### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji
 
 The names and original orientations
 ![image](pieces.png)
