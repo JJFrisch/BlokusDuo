@@ -1,13 +1,30 @@
-piece_id = {1: "i1", 2: "i1", 3: "triple line", 4: "quadruple line", 12: "f"}
+piece_id = {1: "i1", 2: "i2", 3: "i3", 4: "quadruple line", 12: "f"}
 pieces = {
-    1: [
+    1: [[
         #only has corners on the one block
         [],
         [[0, 0]],
         [[0, 0]],
         [[0, 0]],
         [[0, 0]]
-    ],
+    ]],
+    2: [[
+        # orientation #1
+        [[0, -1]],
+        [[0, -1]],
+        [[0, 0]],
+        [[0, 0]],
+        [[0, -1]]
+    ]],
+    3: [[
+        # orientation #1
+        [[0, -1]],
+        [[0, -1]],
+        [[0, 0]],
+        [[0, 0]],
+        [[0, -1]]
+    ]],
+    # fill in the first forms of the other pieces
     12: [
         # orientation #1
         [
@@ -25,11 +42,11 @@ pieces = {
         #orientation #2
         [
             # attached squares
-            [[1, 1], [-1,0], [0,-1], [1,0]],
+            [[1, 1], [-1, 0], [0, -1], [1, 0]],
             [[1, -1]],
             [[1, -1], [0, 1]],
             [[0, 1], [-1, 0]],
-            [[-1, 0], [0,-1]]
+            [[-1, 0], [0, -1]]
         ],
     ]
 }
@@ -43,6 +60,10 @@ class Board:
 	'''
 
     def __init__(self, s: int):
+        self.running = True
+        self.state = "p1_turn"
+
+        self.dim = s
         self.board = [[0 for i in range(s)] for j in range(s)]
         self.turn = 1
 
@@ -57,9 +78,12 @@ class Board:
         self.p1_possible_squares = [[5, 5, True, True, True, True]]
         self.p2_possible_squares = [[9, 9, True, True, True, True]]
 
-        #played pieces
-        self.p1_pieces = [False] * 21
-        self.p2_pieces = [False] * 21
+        #played pieces  # We may want to flip this and say the pieces that have not been played
+        # or rather the pieces avalible to play (feels more intuitive)
+        self.played = {
+            "1": [],  # player 1 pieces
+            "2": []  # player 2 pieces
+        }
 
     def print(self):
         for line in self.board:
@@ -73,7 +97,7 @@ class Board:
             print()
 
     def getItem(self, coord: tuple[int]):
-        #we dont need these checks, eventually theyre prob gonna be removed anyways for that optimization
+        #we dont need these checks, eventually theyre prob gonna be removed anyways for that optimization # Always good to have checks!!!! # never know when it'll help with our errors
         if len(coord) != 2:
             raise IndexError
         if coord[0] < 0 or coord[0] >= len(
@@ -84,11 +108,30 @@ class Board:
     def place(self, i, j, id, orientation, plr):
         print(pieces[id][orientation])
         piece = pieces[id][orientation]
+
+        # check if peice is valid
+        if id in self.played[plr]:
+            return  # unable to play
+
+        #check if piece is inbounds
+        if self.inBounds(i, j, id, orientation):
+            return  # unable to play
+
         self.board[i][j] = plr
         for square in piece[0]:
             aj, ai = square
             self.board[i + ai][j + aj] = plr
 
+    def inBounds(self, x, y, id, orientation):
+        # we could for ease of inbounds on board keep values of dist from center x,y for each orientation
+        # along the lines of more processing beforehand is better
 
+        if x - pieces[id][orientation]['left'] < 0 and x - pieces[id][
+                orientation]['right'] >= self.dim:
+            return False
 
+        if y - pieces[id][orientation]['top'] < 0 and x - pieces[id][
+                orientation]['bottom'] >= self.dim:
+            return False
 
+        return True
