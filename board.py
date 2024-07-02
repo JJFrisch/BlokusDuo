@@ -152,7 +152,20 @@ class Board:
                                             #moves append
                                             legal_placements.append([center[0], center[1], piece_num, orientation_number])
         return legal_placements
-                                        
+
+
+    def is_legal_move(self, x, y, choice, orientaion):
+        valid = True
+        for block in self.pieces[choice][orientaion][0]:
+            x_prime = block[0]+x
+            y_prime = block[1]+y
+            if not self.is_valid_to_place_here(x_prime, y_prime):
+                valid = False
+
+        # also need to check one of the corners is touching
+
+        
+        return valid
                                         
     def place_piece(self, x, y, piece, orientation): #JF
         self.board[y][x] = self.turn
@@ -189,13 +202,20 @@ class Board:
     
     # UI, etc. for a human to be able to play a piece
     def humanTurn(self):
-        choice = input(f"Player {self.turn}'s turn. Choose a piece to place: ")
-        x = input(f"Player {self.turn}'s turn. Choose the x coordinate of the piece: ")
-        y = input(f"Player {self.turn}'s turn. Choose the y coordinate of the piece: ")
-        orientaion = input(f"Player {self.turn}'s turn. Choose the orientation of the piece: ")
-        all_moves = self.calculateLegalMoves()
-        move = all_moves[random.randint(0,len(all_moves))]
-        self.place_piece(move[0], move[1], move[2], move[3])
+        legal_move = False
+        while legal_move == False:
+            choice = int(input(f"Player {self.turn}'s turn. Choose a piece to place: "))
+            x = int(input(f"Player {self.turn}'s turn. Choose the x coordinate of the piece: "))
+            y = int(input(f"Player {self.turn}'s turn. Choose the y coordinate of the piece: "))
+            orientaion = int(input(f"Player {self.turn}'s turn. Choose the orientation of the piece: "))
+            legal_move = self.is_valid_to_place_here(x,y)
+            if legal_move:
+                legal_move = self.is_legal_move(x, y, choice, orientaion)
+            if legal_move:
+                break
+            print("NOOOOOOOOOOOOOOOOOO try again")
+            
+        self.place_piece(x, y, choice, orientaion)
         # input + call placing
         # self.place()
         return
