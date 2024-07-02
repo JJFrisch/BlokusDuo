@@ -19,7 +19,7 @@ class Board:
     2 represents player 2's placed pieces
 	'''
 
-    def __init__(self, s: int):
+    def __init__(self, s: int, pieces):
         
         self.running = True
         self.state = "p1_turn"
@@ -37,12 +37,18 @@ class Board:
         self.p2_score = 0
 
         # possible squares and corner avalibility (x,y,NE,SE,SW,NW)
-        self.p1_possible_squares = [[5, 5, True, True, True, True]]
-        self.p2_possible_squares = [[9, 9, True, True, True, True]]
+        self.possible_squares = [
+            [[5, 5, [True, True, True, True]]], #player 1 possible squares
+            [[9, 9, [True, True, True, True]]] #player 2 possible squares
+        ]
 
         # available pieces
-        self.p1_inv = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-        self.p2_inv = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+        self.inv = [
+            [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21], #player 1
+            [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] #player 2
+        ]
+
+        self.pieces = pieces
 
     def print(self):
         print(self)
@@ -99,65 +105,64 @@ class Board:
 
     
     # returns a list of all legal moves for current player's turn
-    def legalMoves(self, turn):
+    def legalMoves(self):
        # check all corners of the current player
         legal_placements = []
-        for y in range(0,self.dim):
-            for x in range(0,self.dim):
-                legal = False
-                for corner in self.getCorners(x,y):
-                    if self.board[y][x] == turn:
-                        legal = True
-                for edge in self.getEdges(x,y):
-                    if self.board[y][x] == turn:
-                        legal = False
+        for x,y,NE,SE,SW,NW in self.possible_squares[self.turn-1]:
+            if self.board[y][x] == 0:
+                if self.turn not in self.getEdges(x,y):
+                    for piece in self.inv[self.turn]:
+                        for orientation_number in piece_possible_orientations[piece-1]:
+                            orientation = self.pieces[piece][orientation_number]
+                            corner_diffs = [[]]
+                            for direction_to_corner in [NE,SE,SW,NW]:
+                                if direction_to_corner == True:
+                                    # if the direction is True, then the piece can go to the corner
+                                    #ran out of time gimmi one sec.
 
-                if legal:
-                    legal_placements.append([x,y])
-
-        print(legal_placements)
-        print("DEBUG: len(legal_placements): ",len(legal_placements)) # appears to be empty
-        # assume we have a list of possible corners
-        moves = [] # list of all legal moves (including different orientations)
-        dots = self.p1_possible_squares if turn == 1 else self.p2_possible_squares
+        # print(legal_placements)
+        # print("DEBUG: len(legal_placements): ",len(legal_placements)) # appears to be empty
+        # # assume we have a list of possible corners
+        # moves = [] # list of all legal moves (including different orientations)
+        # dots = self.p1_possible_squares if turn == 1 else self.p2_possible_squares
         
-        inv = self.p1_inv if turn == 1 else self.p2_inv
-        for corner in legal_placements:
-            # check each piece for the current corner
-            for piece in inv:
-                # check each orientation for the current piece
-                for orientation in pieces[piece]:
-                    grid = orientation[0]
-                    board = self.board
-                    goodPlace = True    
-                    for square in grid:
-                        x = corner[0] + square[0]
-                        y = corner[1] + square[1]
+        # inv = self.p1_inv if turn == 1 else self.p2_inv
+        # for corner in legal_placements:
+        #     # check each piece for the current corner
+        #     for piece in inv:
+        #         # check each orientation for the current piece
+        #         for orientation in pieces[piece]:
+        #             grid = orientation[0]
+        #             board = self.board
+        #             goodPlace = True    
+        #             for square in grid:
+        #                 x = corner[0] + square[0]
+        #                 y = corner[1] + square[1]
 
-                        # check bounds
-                        if(x < 0 or x >= self.dim or y < 0 or y >= self.dim):
-                            goodPlace = False
-                            # print something ?
-                            break
+        #                 # check bounds
+        #                 if(x < 0 or x >= self.dim or y < 0 or y >= self.dim):
+        #                     goodPlace = False
+        #                     # print something ?
+        #                     break
 
-                        # check if the square is occupied
-                        if(board[x][y] != 0):
-                            goodPlace = False
-                            break
+        #                 # check if the square is occupied
+        #                 if(board[x][y] != 0):
+        #                     goodPlace = False
+        #                     break
 
-                        # check if the player has placed at an adjacent square, first by checking bounds and then checking status of adj. squares
-                        if((x-1 >= 0 and board[x-1][y] == turn) or (x+1 < self.dim and board[x+1][y]) == turn or (y-1 >= 0 and board[x][y-1] == turn) or (y+1 < self.dim and board[x][y+1] == turn)):
-                            goodPlace = False
-                            break
+        #                 # check if the player has placed at an adjacent square, first by checking bounds and then checking status of adj. squares
+        #                 if((x-1 >= 0 and board[x-1][y] == turn) or (x+1 < self.dim and board[x+1][y]) == turn or (y-1 >= 0 and board[x][y-1] == turn) or (y+1 < self.dim and board[x][y+1] == turn)):
+        #                     goodPlace = False
+        #                     break
                     
-                    if goodPlace:
-                        moves.append(orientation)
-                        # can add more information about the move
+        #             if goodPlace:
+        #                 moves.append(orientation)
+        #                 # can add more information about the move
                         
                 
 
-        print("DEBUG: len(moves): ",len(moves))     
-        return moves
+        # print("DEBUG: len(moves): ",len(moves))     
+        # return moves
 
   
 

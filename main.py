@@ -3,13 +3,15 @@ import json
 from board import Board
 from orient import generatePiecesDict, rotate
 
-board = Board(14)
+#read from file to get the pieces arrays
+
+board = Board(14, pieces)
 
 # new_pieces = generatePiecesDict(pieces)
 board.print()
 
 # board.place(5, 5, 12, 0, 1)
-print(board.legalMoves(board.turn))
+print(board.legalMoves())
 
 # print(new_pieces[12][0])
 # print(new_pieces[12][4])  # to check the generatePiecesDict function
