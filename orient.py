@@ -1,4 +1,12 @@
 import copy
+# import h5py
+
+
+# with h5py.File('pieces_storage.hdf5', 'r') as f:
+#     d1 = f['pieces']
+
+# with h5py.File('pieces_storage.hdf5', 'w') as f:
+#     f.create_dataset('pieces', data = pieces) 
 
 pieces = {
     1: [[
@@ -262,24 +270,3 @@ def generatePiecesDict(pieces_first_orientation): #JF
 
 
 
-# not sure if we need whats below this
-
-def flip(coords):
-    for coord in coords:
-        coords[0], coords[1] = -coords[0], coords[1]
-        
-# def rotate(coords, amt):
-#     if amt == 0: return coords
-#     for coord in coords:
-#         coords[0], coords[1] = coords[1], -coords[0]
-#     rotate(coords, amt - 1)
-
-def orient(piece, orientation):
-    # 0=default, 1=90, 2=180, 3=270, 4=flip, 5=flip90, 6=flip180, 7=flip270
-    f = orientation >= 4
-    r = orientation % 4
-    
-    squares, ne, se, sw, nw = piece
-    if f: flip(squares)
-    rotate(squares, r)
-    return [squares, ne, se, sw, nw]
