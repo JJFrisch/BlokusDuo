@@ -22,13 +22,12 @@ while board.running:
     #player 1's turn
     board.randomTurn()
     board.print()
-
+    break
 
   if board.state == 'p2_turn':
     #player 2's turn
     board.humanTurn()
     board.print()
-    break
 
   if board.state == 'end':
     break

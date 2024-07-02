@@ -174,19 +174,32 @@ class Board:
 
         # for each possible corner, check if it's legal
         # then add to possible squares
+
+
+        #doesn't work yet!!!!! 
         NE,SE,SW,NW = self.pieces[piece][orientation][1:]
         for dir in range(4):
             for corner in [NE,SE,SW,NW][dir]:
                 possible_dot_x = x + (-1*self.corner_diffs[dir][0]) + corner[0]
                 possible_dot_y = y + (-1*self.corner_diffs[dir][1]) + corner[0]
                 if self.is_valid_to_place_here(possible_dot_x, possible_dot_y):
-                    self.possible_squares[self.turn-1].append([possible_dot_x, possible_dot_y])
+                    possible_corners = []
+                    for possible_corner_dir in self.corner_diffs:
+                        if self.is_valid_to_place_here(possible_corner_dir[0]*1, possible_corner_dir[1]*-1):
+                            possible_corners.append(True)
+                        else:
+                            possible_corners.append(False)
+                    self.possible_squares[self.turn-1].append([possible_dot_x, possible_dot_y, possible_corners])
 
         # remove the piece from inventory
         self.inv[self.turn-1].remove(piece)    
         # change state and turn
-        self.state = "p2_turn"
-        self.turn = 2 if self.turn == 1 else 1
+        if self.state == 'p1_turn':
+            self.state = 'p2_turn'
+            self.turn = 2
+        else:
+            self.state = 'p1_turn'
+            self.turn = 1
         #update score
         self.score[self.turn-1] += 1 + len(self.pieces[piece][orientation][0])
                 
@@ -196,8 +209,10 @@ class Board:
 
     def randomTurn(self):
         all_moves = self.calculateLegalMoves()
-        move = all_moves[random.randint(0,len(all_moves))]
+        print(self.possible_squares[self.turn-1])
+        move = all_moves[random.randint(0,len(all_moves)-1)]
         self.place_piece(move[0], move[1], move[2], move[3])
+        print(self.possible_squares[0])
         return
     
     # UI, etc. for a human to be able to play a piece
@@ -205,6 +220,11 @@ class Board:
         legal_move = False
         while legal_move == False:
             choice = int(input(f"Player {self.turn}'s turn. Choose a piece to place: "))
+
+            if choice == 'exit' or choice == 'quit':
+                self.running = False
+                return
+            
             x = int(input(f"Player {self.turn}'s turn. Choose the x coordinate of the piece: "))
             y = int(input(f"Player {self.turn}'s turn. Choose the y coordinate of the piece: "))
             orientaion = int(input(f"Player {self.turn}'s turn. Choose the orientation of the piece: "))
@@ -216,9 +236,7 @@ class Board:
             print("NOOOOOOOOOOOOOOOOOO try again")
             
         self.place_piece(x, y, choice, orientaion)
-        # input + call placing
-        # self.place()
-        return
+        
 
 
 
