@@ -1,15 +1,12 @@
 import json
 
-from board import Board
+from board import Board, pieces
 from orient import generatePiecesDict, rotate
 
 #read from file to get the pieces arrays
-orientation = [[0,0,[0,0], [0,0]], [[0,0], [1,1]], [[0,0], [99,1]], [[0,0], [1,1]], [[0,0], [1,1]] ]
-NE,SE,SW,NW = orientation[1:]
-print(SE)
 
 
-# board = Board(14, pieces)
+board = Board(14, pieces)
 
 # # new_pieces = generatePiecesDict(pieces)
 # board.print()
@@ -23,15 +20,13 @@ print(SE)
 while board.running:
   if board.state == 'p1_turn':
     #player 1's turn
+    board.randomTurn()
+    board.print()
 
-    # board.print()
-    break
-    # what is it that happens on each turn?
-    #
-    # identify places to put pieces
 
   if board.state == 'p2_turn':
     #player 2's turn
+    board.humanTurn()
     board.print()
     break
 
