@@ -1,24 +1,25 @@
-from board import Board, pieces
+import json
+
+from board import Board
 from orient import generatePiecesDict, rotate
-
-
-
 
 board = Board(14)
 
-board.place(5, 5, 12, 1, 2)  #the manual 2nd rotation of block '12'
+# new_pieces = generatePiecesDict(pieces)
 board.print()
 
-print(rotate(pieces[12][0]))  # to check the rotate_ function, see if it lines up with the manual rotation
-new_pieces = generatePiecesDict(pieces)
-print(new_pieces[12][1])  # to check the generatePiecesDict function
-print(new_pieces[1][1])  # to check the generatePiecesDict function
+# board.place(5, 5, 12, 0, 1)
+print(board.legalMoves(board.turn))
+
+# print(new_pieces[12][0])
+# print(new_pieces[12][4])  # to check the generatePiecesDict function
 
 while board.running:
   if board.state == 'p1_turn':
     #player 1's turn
-    board.print()
-
+    
+    # board.print()
+    break
     # what is it that happens on each turn?
     # 
     # identify places to put pieces
@@ -27,3 +28,7 @@ while board.running:
   if board.state == 'p2_turn':
     #player 2's turn
     board.print()
+    break
+
+  if board.state == 'end':
+    break

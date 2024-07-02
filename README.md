@@ -5,7 +5,7 @@ The names and original orientations
 ![image](pieces.png)
 
  
-The reference sheet for the names and orientations for the blocks
+The reference sheet for the names, point count, corners and orientations of the blocks.
 https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUDPpI/edit?gid=0#gid=0
 
 #### For us to commit back to GitHub:

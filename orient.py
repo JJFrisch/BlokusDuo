@@ -1,5 +1,182 @@
 import copy
 
+pieces = {
+    1: [[
+        #only has corners on the one block
+        [],
+        [[0, 0]],
+        [[0, 0]],
+        [[0, 0]],
+        [[0, 0]]
+    ]],
+    2: [[
+        # orientation #2
+        [[0, -1]],
+        [[0, 0]],
+        [[0, -1]],
+        [[0, -1]],
+        [[0, 0]]
+    ]],
+    3: [[
+        # orientation #1
+        [[0, -1], [0, 1]],
+        [[0, 1]],
+        [[0, -1]],
+        [[0, -1]],
+        [[0, 1]]
+    ]],
+    4: [[
+        # orientation #1
+        [[0, -1], [0, 1], [0, 2]],
+        [[0, 2]],
+        [[0, -1]],
+        [[0, -1]],
+        [[0, 2]]
+    ]],
+    5: [[
+        # orientation #1
+        [[0, -1], [0, 1], [0, 2], [0, -2]],
+        [[0, 2]],
+        [[0, -2]],
+        [[0, -2]],
+        [[0, 2]]
+    ]],
+    6: [[
+        # orientation #1
+        #Pieces
+        [[1, 0], [0, 1], [-1, 1]],
+        [[0, 1], [1, 0]],
+        [[1, 0]],
+        [[0, 0], [-1, 1]],
+        [[-1, 1]]   
+    ]],
+    7: [[
+        [[0, -1], [1, 0], [-1, 0]],
+        [[1, 0]],
+        [[1, 0], [0, -1]],
+        [[0, -1], [-1, 0]],
+        [[-1, 0]]
+    ]],
+    8:[[
+        [[0, -1], [-1, 0], [-2, 0]],
+        [[0,0]],
+        [[0, -1]],
+        [[0, -1], [-2, 0]],
+        [[-2, 0]]
+    ]],
+    9: [[
+        [[1, 0], [0, 1], [1, 1]],
+        [[1,1]],
+        [[1,0]],
+        [[0,0]],
+        [[0,1]]
+    ]],
+    10: [[
+        [[0, -1], [1, -1], [-1, 0], [-1, 1]],
+        [[-1, 1], [0, 0], [1, -1]],
+        [[1, -1]],
+        [[0, -1], [-1, 0]],
+        [[-1, 1]]
+    ]],
+    11: [[
+        [[0, -1]], [[1, 0]], [[1, 1]], [[0, 1]],
+        [[1, 1]],
+        [[1, 0]], [[0, -1]],
+        [[0, -1]], 
+        [[0, 1]]
+    ]],
+    # fill in the first forms of the other pieces
+    12: [
+        # orientation #1
+        [
+            # attached squares
+            [[1, -1], [0, -1], [0, 1], [-1, 0]],
+            # has northeast corners
+            [[1, -1]],
+            # has southeast corners
+            [[0, 1], [1, -1]],
+            # has southwest corners
+            [[0, 1], [-1, 0]],
+            # has northwest corners
+            [[-1, 0], [0, -1]]
+        ],
+        # #orientation #2
+        # [
+        #     # attached squares
+        #     [[1, 1], [-1, 0], [0, -1], [1, 0]],
+        #     [[1, -1]],
+        #     [[1, -1], [0, 1]],
+        #     [[0, 1], [-1, 0]],
+        #     [[-1, 0], [0, -1]]
+        # ],
+    ],
+    13: [
+        [
+        [[0, -1], [0, 1], [1, 1], [-1, 1]],
+        [[1,1]],
+        [[1,1], [0,-1]],
+        [[0,-1], [-1,1]],
+        [[-1,1]]
+    ]
+    ],
+    14: [[
+        [[1, 0], [0,-1], [-1, 0], [0,1]],
+        [[0,1], [1,0]],
+        [[1,0], [0, -1]],
+        [[0, -1], [-1, 0]],
+        [[-1, 0], [0, 1]]
+    ]],
+    15: [[
+        [[0,-1], [1, -1], [0, 1], [-1, 1]],
+        [[0,1], [1, -1]],
+        [[1,-1]],
+        [[0, -1], [-1, 1]],
+        [[-1, 1]]
+    ]],
+    16: [[
+        [[1, 0], [2, 0], [0, 1], [0, 2]],
+        [[0, 2], [2, 0]],
+        [[2, 0]], 
+        [[0, 0]],
+        [[0, 2]]
+    ]],
+    17: [[
+        [[0, -1], [1, -1], [0, 1], [1,1]],
+        [[1, 1], [1, -1]],
+        [[1, 1], [1, -1]],
+        [[0, -1]],
+        [[0, 1]]
+    ]],
+    18: [[
+        [[1, 0], [0, 1]],
+        [[0, 1], [1, 0]],
+        [[1, 0]],
+        [[0, 0]],
+        [[0, 1]]
+    ]],
+    19: [[
+        [[0, -1], [1, -1], [-1, 0], [-2, 0]],
+        [[0,0], [1, -1]],
+        [[1, -1]],
+        [[0, -1], [-2, 0]],
+        [[-2, 0]]
+    ]],
+    20: [[
+        [[-2, 0], [-1, 0], [0, -1], [1, -1]],
+        [[0, 0], [1, -1]],
+        [[1, -1]],
+        [[-2, 0], [0, -1]],
+        [[-2, 0]]
+    ]],
+    21: [[
+        [[0, -2], [0, -1], [0, 1], [0, 2]],
+        [[0, 2]],
+        [[0, -2]],
+        [[0, -2]],
+        [[0, 2]]
+    ]]
+}
+
 def rotate(prev_orientation): #JF
     new_o = []
     ne = []
@@ -56,20 +233,30 @@ def generatePiecesDict(pieces_first_orientation): #JF
   to_return = {}
   for piece_num in pieces_first_orientation.keys():
     orientations = [pieces_first_orientation[piece_num][0]]
-    for i in range(7): # there are 8 orientations, 1 is already generated
+    for i in range(3): # there are 3 more orientations, 1 is already generated
       prev_orientation = orientations[i]
       next_orientation = rotate(prev_orientation)
       orientations.append(next_orientation)
 
+    # time to flip the first orientation
+    next_orientation = []
+    for i in range(len(orientations[0])):
+      part_of_orientation = []
+      for edge in orientations[0][i]:
+        if edge != []:
+          print(piece_num)
+          part_of_orientation.append([edge[0]*-1, edge[1]])
+      next_orientation.append(part_of_orientation)
+      orientations.append(next_orientation)
+
+    for i in range(3): # there are 3 more orientations, 1 is already generated
+      prev_orientation = orientations[i]
+      next_orientation = rotate(prev_orientation)
+      orientations.append(next_orientation)
+    
     to_return[piece_num] = orientations
 
   return to_return
-
-
-
-
-
-
 
 
 
@@ -96,4 +283,3 @@ def orient(piece, orientation):
     if f: flip(squares)
     rotate(squares, r)
     return [squares, ne, se, sw, nw]
-
