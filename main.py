@@ -1,21 +1,19 @@
-import json
+from board import Board
+from orient import generatePiecesDict, rotate, pieces
 
-from board import Board, pieces
-from orient import generatePiecesDict, rotate
+better_pieces = generatePiecesDict(pieces)
 
 #read from file to get the pieces arrays
 
-
-board = Board(14, pieces)
-
+print(len(better_pieces[12]), 'pp')
+board = Board(14, better_pieces)
+board.place_piece([2, 2, 11, 0, 0, 0])  #JF
+board.place_piece([3, 8, 11, 1, 0, 0])  #JF
+board.place_piece([8, 3, 11, 2, 0, 0])  #JF
+board.place_piece([7, 7, 11, 3, 0, 0])  #JF
 # # new_pieces = generatePiecesDict(pieces)
-# board.print()
-
-# # board.place(5, 5, 12, 0, 1)
-# print(board.legalMoves())
-
-# print(new_pieces[12][0])
-# print(new_pieces[12][4])  # to check the generatePiecesDict function
+board.print()
+board.running = False
 
 while board.running:
   if board.state == 'p1_turn':

@@ -201,7 +201,7 @@ def rotate(prev_orientation): #JF
         if edge == [1,1]:
           new_o.append([-1,1])
         if edge == [-1,1]:
-          new_o.append([1,-1])
+          new_o.append([-1,-1])
 
         if edge[0] == 0 and edge[1] < 0:
           new_o.append([-1*edge[1],0])
@@ -238,7 +238,7 @@ def rotate(prev_orientation): #JF
     return to_return
 
 def generatePiecesDict(pieces_first_orientation): #JF
-  to_return = {}
+  to_return = []
   for piece_num in pieces_first_orientation.keys():
     orientations = [pieces_first_orientation[piece_num][0]]
     for i in range(3): # there are 3 more orientations, 1 is already generated
@@ -252,17 +252,16 @@ def generatePiecesDict(pieces_first_orientation): #JF
       part_of_orientation = []
       for edge in orientations[0][i]:
         if edge != []:
-          print(piece_num)
           part_of_orientation.append([edge[0]*-1, edge[1]])
       next_orientation.append(part_of_orientation)
-      orientations.append(next_orientation)
+    orientations.append(next_orientation)
 
     for i in range(3): # there are 3 more orientations, 1 is already generated
       prev_orientation = orientations[i]
       next_orientation = rotate(prev_orientation)
       orientations.append(next_orientation)
     
-    to_return[piece_num] = orientations
+    to_return.append(orientations)
 
   return to_return
 
