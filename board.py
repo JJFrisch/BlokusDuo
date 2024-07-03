@@ -44,8 +44,8 @@ class Board:
 
         # available pieces
         self.inv = [
-            [11], #1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21], #player 1
-            [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21] #player 2
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], #player 1
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] #player 2
         ]
 
         self.pieces = pieces
@@ -199,23 +199,23 @@ class Board:
                     # print('valid')
                     possible_corners = []
                     for possible_corner_dir in self.corner_diffs:
-                        if self.is_valid_to_place_here(possible_dot_x+possible_corner_dir[0]*1, possible_dot_x+possible_corner_dir[1]*1):
+                        if self.is_valid_to_place_here(possible_dot_x+possible_corner_dir[0]*-1, possible_dot_y+possible_corner_dir[1]*-1):
                             possible_corners.append(True)
                         else:
                             possible_corners.append(False)
                     self.possible_squares[self.turn-1].append([possible_dot_x, possible_dot_y, possible_corners])
 
         # remove the piece from inventory
-        # self.inv[self.turn-1].remove(piece_num)    
-        # # change state and turn
-        # if self.state == 'p1_turn':
-        #     self.state = 'p2_turn'
-        #     self.turn = 2
-        # else:
-        #     self.state = 'p1_turn'
-        #     self.turn = 1
-        # #update score
-        # self.score[self.turn-1] += 1 + len(self.pieces[piece_num][orientation_number][0])
+        self.inv[self.turn-1].remove(piece_num)    
+        # change state and turn
+        if self.state == 'p1_turn':
+            self.state = 'p2_turn'
+            self.turn = 2
+        else:
+            self.state = 'p1_turn'
+            self.turn = 1
+        #update score
+        self.score[self.turn-1] += 1 + len(self.pieces[piece_num][orientation_number][0])
                 
 
 
@@ -226,7 +226,7 @@ class Board:
         print(self.possible_squares[self.turn-1])
         move = all_moves[random.randint(0,len(all_moves)-1)]
         self.place_piece(move)
-        print(self.possible_squares[0])
+        # print(self.possible_squares[0])
         return
     
     # UI, etc. for a human to be able to play a piece

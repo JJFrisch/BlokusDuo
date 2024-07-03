@@ -6,9 +6,10 @@ pieces = generatePiecesDict(pieces)
 #read from file to get the pieces arrays
 
 board = Board(14, pieces)   
-board.board[4][5] = 1
-board.board[3][4] = 1
-board.board[3][5] = 1
+# board.board[4][5] = 1
+# board.board[3][4] = 1
+# board.board[3][5] = 1
+# board.board[6][4] = 1
 board.print()
 
 while board.running:
@@ -16,7 +17,7 @@ while board.running:
     #player 1's turn
     board.randomTurn()
     board.print()
-    break
+    # break
 
   if board.state == 'p2_turn':
     #player 2's turn
