@@ -5,8 +5,10 @@ pieces = generatePiecesDict(pieces)
 
 #read from file to get the pieces arrays
 
-board = Board(14, pieces)
-
+board = Board(14, pieces)   
+board.board[4][5] = 1
+board.board[3][4] = 1
+board.board[3][5] = 1
 board.print()
 
 while board.running:

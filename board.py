@@ -170,6 +170,9 @@ class Board:
                                         
     def place_piece(self, move): #JF
         x, y, piece_num, orientation_number, poss_squares_i, dir = move
+        print(x, 'x', y, 'y', dir, 'dir') # seems like the wrong dir is given TL=1, TR=2 BR=3 BL=0
+        #quick fix but not really
+        dir = (dir+2)%4
         dot_to_place_on_dirs = self.possible_squares[self.turn-1][poss_squares_i][2]
         dot_to_place_on_dirs[dir] = False
         if True not in dot_to_place_on_dirs :
@@ -185,18 +188,19 @@ class Board:
 
         #doesn't work yet!!!!! 
         NE,SE,SW,NW = self.pieces[piece_num][orientation_number][1:]
-        print(NE,SE,SW,NW)
+        # print(NE,SE,SW,NW)
         for dir in range(4):
             for corner in [NE,SE,SW,NW][dir]:
-                print(corner, "corner", -1*self.corner_diffs[dir][0], -1*self.corner_diffs[dir][1], dir)
+                # print(corner, "corner", -1*self.corner_diffs[dir][0], -1*self.corner_diffs[dir][1], x, y, 'x,y')
                 possible_dot_x = x + (-1*self.corner_diffs[dir][0]) + corner[0]
-                possible_dot_y = y + (-1*self.corner_diffs[dir][1]) + corner[0]
-                print(possible_dot_x, possible_dot_y, 'x, y', x, y)
+                possible_dot_y = y + (-1*self.corner_diffs[dir][1]) + corner[1]
+                # print(possible_dot_x, possible_dot_y, 'x, y', x, y)
                 if self.is_valid_to_place_here(possible_dot_x, possible_dot_y):
-                    print('hello')
+                    # print('valid')
                     possible_corners = []
                     for possible_corner_dir in self.corner_diffs:
-                        if self.is_valid_to_place_here(possible_corner_dir[0]*1, possible_corner_dir[1]*-1):
+                        print((possible_corner_dir[0]*1, possible_corner_dir[1]*1))
+                        if self.is_valid_to_place_here(possible_corner_dir[0]*1, possible_corner_dir[1]*1):
                             possible_corners.append(True)
                         else:
                             possible_corners.append(False)
