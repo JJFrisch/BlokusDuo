@@ -256,7 +256,7 @@ def generatePiecesDict(pieces_first_orientation): #JF
       next_orientation.append(part_of_orientation)
     orientations.append(next_orientation)
 
-    for i in range(3): # there are 3 more orientations, 1 is already generated
+    for i in range(4,7): # there are 3 more orientations, 1 is already generated
       prev_orientation = orientations[i]
       next_orientation = rotate(prev_orientation)
       orientations.append(next_orientation)

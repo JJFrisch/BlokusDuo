@@ -1,19 +1,13 @@
 from board import Board
-from orient import generatePiecesDict, rotate, pieces
+from orient import generatePiecesDict, pieces
 
-better_pieces = generatePiecesDict(pieces)
+pieces = generatePiecesDict(pieces)
 
 #read from file to get the pieces arrays
 
-print(len(better_pieces[12]), 'pp')
-board = Board(14, better_pieces)
-board.place_piece([2, 2, 11, 0, 0, 0])  #JF
-board.place_piece([3, 8, 11, 1, 0, 0])  #JF
-board.place_piece([8, 3, 11, 2, 0, 0])  #JF
-board.place_piece([7, 7, 11, 3, 0, 0])  #JF
-# # new_pieces = generatePiecesDict(pieces)
+board = Board(14, pieces)
+
 board.print()
-board.running = False
 
 while board.running:
   if board.state == 'p1_turn':
