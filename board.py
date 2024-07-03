@@ -199,8 +199,7 @@ class Board:
                     # print('valid')
                     possible_corners = []
                     for possible_corner_dir in self.corner_diffs:
-                        print((possible_corner_dir[0]*1, possible_corner_dir[1]*1))
-                        if self.is_valid_to_place_here(possible_corner_dir[0]*1, possible_corner_dir[1]*1):
+                        if self.is_valid_to_place_here(possible_dot_x+possible_corner_dir[0]*1, possible_dot_x+possible_corner_dir[1]*1):
                             possible_corners.append(True)
                         else:
                             possible_corners.append(False)
