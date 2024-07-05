@@ -28,10 +28,11 @@ class Board:
         self.dim = s
         self.board = [[0 for i in range(s)] for j in range(s)]
         self.turn = 1
+        self.number_of_rounds = 0
 
         #change the color of the start positions
-        self.board[s - 5][s - 5] = 2
-        self.board[4][4] = 1
+        # self.board[s - 5][s - 5] = 2
+        # self.board[4][4] = 1
 
         # score is the # of tiles placed by each player
         self.score = [0,0] # player 1 and player 2
@@ -103,24 +104,29 @@ class Board:
 
     def getEdgesValues(self, x, y):
         edges_values = []
-        edges_values.append(self.board[y][x+1])
-        edges_values.append(self.board[y+1][x])
-        edges_values.append(self.board[y][x-1])
-        edges_values.append(self.board[y-1][x])
+        if x+1 < len(self.board):
+            edges_values.append(self.board[y][x+1])
+        if y+1 < len(self.board):
+            edges_values.append(self.board[y+1][x])
+        if x-1 >= 0:
+            edges_values.append(self.board[y][x-1])
+        if x-1 >= 0:
+            edges_values.append(self.board[y-1][x])
         return edges_values
     #legal moves
 
     def is_valid_to_place_here(self, x, y):
         valid = True
+        if x >= self.dim or y >= self.dim or x < 0 or y < 0:
+            return False
+            
         edges_values = self.getEdgesValues(x, y)
         if self.turn in edges_values:
             valid = False
         # not already taken by either team
         if self.board[y][x] != 0:
             valid = False
-        # not out of bounds
-        if x >= self.dim or y >= self.dim or x < 0 or y < 0:
-            valid = False
+
         return valid
 
     
@@ -128,13 +134,16 @@ class Board:
     def calculateLegalMoves(self): #JF
        # check all corners of the current player
         legal_placements = []
-        for poss_squares_i in range(len(self.possible_squares[self.turn-1])):#[x,y,[NE,SE,SW,NW]] in self.possible_squares[self.turn-1]:
-            # print([x,y,[NE,SE,SW,NW]])
+        for poss_squares_i in range(len(self.possible_squares[self.turn-1])):
             x,y,[NE,SE,SW,NW] = self.possible_squares[self.turn-1][poss_squares_i]
+            # print(x,y,[NE,SE,SW,NW])
+            # print()
+            # print(self.inv[self.turn-1])
             if self.board[y][x] == 0 or self.score[self.turn-1] == 0:
-                if self.turn not in self.getEdges(x,y):
-                    for piece_num in self.inv[self.turn-1]:
-                        for orientation_number in piece_possible_orientations[piece_num-1]:
+                print()
+                if self.turn not in self.getEdgesValues(x,y): #Make sure the center isn't touching their own pieces
+                    for piece_num in self.inv[self.turn-1]: # for each piece avalible to place
+                        for orientation_number in piece_possible_orientations[piece_num]: # for each orientation in each piece that is needed to check
                             
                             orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
                             for dir in range(4):
@@ -144,9 +153,12 @@ class Board:
                                     for piece_corner in orientation[dir+1]: # a piece corner is a list of [x,y] for that corner in the NE for ex. array in the orientation
                                         valid = True
                                         center = [ x + self.corner_diffs[dir][0] + (-1*piece_corner[0]), y + self.corner_diffs[dir][1] + (-1*piece_corner[1]) ]
+                                        # print(center, 'center')
+
                                         for block in orientation[0]:
                                             x_prime = block[0]+center[0]
                                             y_prime = block[1]+center[1]
+                                            
                                             if not self.is_valid_to_place_here(x_prime, y_prime):
                                                 valid = False
                                         if valid:
@@ -168,9 +180,11 @@ class Board:
         
         return valid
                                         
-    def place_piece(self, move): #JF
+    def place_piece_ai(self, move): #JF
+        self.number_of_rounds += 1
+        print(move, "move that is being used")
         x, y, piece_num, orientation_number, poss_squares_i, dir = move
-        print(x, 'x', y, 'y', dir, 'dir') # seems like the wrong dir is given TL=1, TR=2 BR=3 BL=0
+        # print(x, 'x', y, 'y', dir, 'dir') # seems like the wrong dir is given TL=1, TR=2 BR=3 BL=0
         #quick fix but not really
         dir = (dir+2)%4
         dot_to_place_on_dirs = self.possible_squares[self.turn-1][poss_squares_i][2]
@@ -179,9 +193,11 @@ class Board:
             self.possible_squares[self.turn-1].remove(poss_squares_i)
             
         self.board[y][x] = self.turn
-        for block in self.pieces[piece_num][orientation_number][0]:
+        for block in self.pieces[piece_num-1][orientation_number][0]:
             self.board[y+block[1]][x+block[0]] = self.turn
 
+        #update score
+        self.score[self.turn-1] += 1 + len(self.pieces[piece_num][orientation_number][0])
         # for each possible corner, check if it's legal
         # then add to possible squares
 
@@ -214,8 +230,6 @@ class Board:
         else:
             self.state = 'p1_turn'
             self.turn = 1
-        #update score
-        self.score[self.turn-1] += 1 + len(self.pieces[piece_num][orientation_number][0])
                 
 
 
@@ -223,9 +237,10 @@ class Board:
 
     def randomTurn(self):
         all_moves = self.calculateLegalMoves()
-        print(self.possible_squares[self.turn-1])
+        # print(self.possible_squares[self.turn-1])
+        # print(all_moves, 'moves')
         move = all_moves[random.randint(0,len(all_moves)-1)]
-        self.place_piece(move)
+        self.place_piece_ai(move)
         # print(self.possible_squares[0])
         return
     
@@ -249,7 +264,7 @@ class Board:
                 break
             print("NOOOOOOOOOOOOOOOOOO try again")
             
-        self.place_piece(x, y, choice, orientaion)
+        # self.place_piece_ai([x, y, choice, orientaion])
         
 
 
