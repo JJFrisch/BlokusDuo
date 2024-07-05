@@ -31,8 +31,8 @@ class Board:
         self.number_of_rounds = 0
 
         #change the color of the start positions
-        # self.board[s - 5][s - 5] = 2
-        # self.board[4][4] = 1
+        self.board[s - 5][s - 5] = 2
+        self.board[4][4] = 1
 
         # score is the # of tiles placed by each player
         self.score = [0,0] # player 1 and player 2
@@ -45,13 +45,14 @@ class Board:
 
         # available pieces
         self.inv = [
-            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], #player 1
-            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] #player 2
+            [12,0],            #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], #player 1
+            [12,0]            #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] #player 2
         ]
 
         self.pieces = pieces
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
-
+        print(self.pieces[10])
+    
     def print(self):
         print(self)
 

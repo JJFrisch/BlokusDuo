@@ -26,7 +26,7 @@ while board.running:
     board.print()
     print(board.inv[0])
     print(board.possible_squares[0])
-    break
+    # break
 
   if board.state == 'p2_turn':
 
