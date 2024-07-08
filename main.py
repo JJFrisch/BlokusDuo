@@ -7,14 +7,15 @@ from orient import generatePiecesDict, pieces, generateCorners, generatePiecesFr
 pieces = generatePiecesDict(pieces)  
 # print(pieces[0][0])
 print(pieces[4][0])
-print(pieces[4][3])
+print(pieces[4][1])
+
 #read from file to get the pieces arrays
 board = Board(14, pieces)   
 
 board.print()
 i = 0
 while board.running:
-  # break
+  break
   # run the first turn
   if board.finished == [True,True]:
     print("Game Over!!")

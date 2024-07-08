@@ -50,7 +50,8 @@ class Board:
 
             # the game seems to struggle to place the following pieces
             # i don't know if it's because of the way the pieces are generated, the way moves are generated, or the way the pieces are placed
-            [0,3,4,12,13,14,19], #player 1
+            # [0,3,4,12,13,14,19], #player 1
+            [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20],
             [0, 4, 12] #player 2
         ]
         
@@ -270,6 +271,7 @@ class Board:
     def firstRandomTurn(self):
         # generate a random move that covers (4,4)
         all_moves = self.calculateFirstLegalMoves()
+
         if all_moves != []:
             move = random.choice(all_moves)
             self.place_piece(move)
@@ -278,6 +280,8 @@ class Board:
     
     def randomTurn(self):
         all_moves = self.calculateLegalMoves()
+        # print(all_moves)
+
         if all_moves != []:
             move = random.choice(all_moves)
             self.place_piece(move)
