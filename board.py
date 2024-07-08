@@ -47,6 +47,9 @@ class Board:
         # ]
 
         self.inv = [ # messing with what pieces are available
+
+            # the game seems to struggle to place the following pieces
+            # i don't know if it's because of the way the pieces are generated, the way moves are generated, or the way the pieces are placed
             [0,3,4,12,13,14,19], #player 1
             [0, 4, 12] #player 2
         ]
