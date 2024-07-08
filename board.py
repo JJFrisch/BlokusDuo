@@ -268,7 +268,7 @@ class Board:
         else:
             self.finished[self.turn-1] = True
             # print(self.finished, self.turn)
-            print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
+            # print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
             # print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
 
         self.turn_count += 1
