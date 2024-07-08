@@ -1,6 +1,6 @@
 from board import Board
 from orient import generatePiecesDict, pieces, generateCorners, generatePiecesFromBlockPos
-
+import csv
 from collections import Counter
 # import pandas as pd
 
@@ -23,7 +23,7 @@ if PRINT_BOARD:
 scores = []
 piecesPlaced = Counter()
 
-for x in range(100):
+for x in range(5000):
   board = Board(14, pieces)
   while board.running:
     p1_done = False
@@ -51,6 +51,7 @@ for x in range(100):
         for piece in inv:
           piecesPlaced[piece+1] += 1
       board.state = 'end'
+      print(str(x) + " completed")
       break
 
 print(scores)
@@ -66,3 +67,8 @@ for scoreTup in scores:
     wins[2]+=1
 print("Player 1 and 2 wins and draws (respectively): " + str(wins))
 print("Player 1 and 2 and draws percents (respectively): " + str(wins[0]/len(scores)) + ' '+ str(wins[1]/len(scores))  + ' '+ str(wins[2]/len(scores)))
+
+with open("scores_temp.csv", 'w', newline='') as f:
+  writer = csv.writer(f)
+  for score in scores:
+    writer.writerow(score)
