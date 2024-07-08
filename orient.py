@@ -73,12 +73,44 @@ def generatePiecesDict(pieces_first_orientation): #JF
 
     # time to flip the first orientation
     next_orientation = []
-    for i in range(len(orientations[0])):
-      part_of_orientation = []
-      for edge in orientations[0][i]:
-        if edge != []:
-          part_of_orientation.append([edge[0]*-1, edge[1]])
-      next_orientation.append(part_of_orientation)
+    # for i in range(len(orientations[0])):
+    #   part_of_orientation = []
+    part_of_orientation = []
+    for edge in orientations[0][0]:
+      # part_of_orientation = []
+      if edge != []:
+        part_of_orientation.append([edge[0]*-1, edge[1]])
+    next_orientation.append(part_of_orientation)
+
+    part_of_orientation = []
+    for edge in orientations[0][4]:
+      # part_of_orientation = []
+      if edge != []:
+        part_of_orientation.append([edge[0]*-1, edge[1]])
+    next_orientation.append(part_of_orientation)
+
+    part_of_orientation = []
+    for edge in orientations[0][3]:
+      # part_of_orientation = []
+      if edge != []:
+        part_of_orientation.append([edge[0]*-1, edge[1]])
+    next_orientation.append(part_of_orientation)
+
+    part_of_orientation = []
+    for edge in orientations[0][2]:
+      # part_of_orientation = []
+      if edge != []:
+        part_of_orientation.append([edge[0]*-1, edge[1]])
+    next_orientation.append(part_of_orientation)
+
+    part_of_orientation = []
+    for edge in orientations[0][1]:
+      # part_of_orientation = []
+      if edge != []:
+        part_of_orientation.append([edge[0]*-1, edge[1]])
+    next_orientation.append(part_of_orientation)
+          
+      
     orientations.append(next_orientation)
 
     for i in range(4,7): # there are 3 more orientations, 1 is already generated
