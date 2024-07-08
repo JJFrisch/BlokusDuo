@@ -23,7 +23,7 @@ if PRINT_BOARD:
 scores = []
 piecesPlaced = Counter()
 
-for x in range(100):
+for x in range(10):
   board = Board(14, pieces)
   while board.running:
     p1_done = False
