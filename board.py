@@ -29,6 +29,7 @@ class Board:
         self.board = [[0 for i in range(s)] for j in range(s)]
         self.turn = 1
         self.turn_count = 0
+        self.finished = [False, False]
         
         # score is the # of tiles placed by each player
         self.score = [0,0] # player 1 and player 2
@@ -40,10 +41,16 @@ class Board:
         ]
 
         # available pieces
-        self.inv = [
-            [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20], #player 1
-            [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20] #player 2
+        # self.inv = [
+        #     [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20], #player 1
+        #     [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20] #player 2
+        # ]
+
+        self.inv = [ # messing with what pieces are available
+            [0,3,4,12,13,14,19], #player 1
+            [0, 4, 12] #player 2
         ]
+        
 
         self.pieces = pieces
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
@@ -249,12 +256,6 @@ class Board:
         # remove the piece from inventory
         self.inv[self.turn-1].remove(piece_num)    
         # change state and turn
-        self.turn_count += 1
-        self.turn = 3 - self.turn # 2 changes to 1, and vice versa
-        if self.state == 'p1_turn':
-            self.state = 'p2_turn'
-        else:
-            self.state = 'p1_turn'
 
     # the first turn has special placement rules, this is the custom function to handle it
 
@@ -266,20 +267,28 @@ class Board:
     def firstRandomTurn(self):
         # generate a random move that covers (4,4)
         all_moves = self.calculateFirstLegalMoves()
-        # print(all_moves)
-        move = random.choice(all_moves)
-        self.place_piece(move)
-        return
-        pass
+        if all_moves != []:
+            move = random.choice(all_moves)
+            self.place_piece(move)
+        else:
+            print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
     
     def randomTurn(self):
-        # if self.turn_count == 0 or self.turn_count == 1:
-        #     self.firstRandomTurn()
-        # else:
         all_moves = self.calculateLegalMoves()
-        # print("DEBUG: board.py/randomTurn(): all_moves: ", all_moves)
-        move = random.choice(all_moves)
-        self.place_piece(move)
+        if all_moves != []:
+            move = random.choice(all_moves)
+            self.place_piece(move)
+        else:
+            self.finished[self.turn-1] = True
+            print(self.finished, self.turn)
+            print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
+
+        self.turn_count += 1
+        self.turn = 3 - self.turn # 2 changes to 1, and vice versa
+        if self.state == 'p1_turn':
+            self.state = 'p2_turn'
+        else:
+            self.state = 'p1_turn'
 
     # UI, etc. for a human to be able to play a piece
     def humanTurn(self):
