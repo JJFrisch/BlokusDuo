@@ -1,5 +1,5 @@
 # BlokusDuo
-### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji
+### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji, Micheal Huang
 
 The names and original orientations
 ![image](pieces.png)
@@ -13,3 +13,6 @@ https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUD
 * type in the terminal: git commit -a
 * write the information about the commit and close the tab
 * type in the terminal: git push
+
+### Blokus Statistical Data spreadsheet
+https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
