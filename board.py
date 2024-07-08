@@ -268,29 +268,36 @@ class Board:
         else:
             self.finished[self.turn-1] = True
             # print(self.finished, self.turn)
+<<<<<<< HEAD
             # print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
             # print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
+=======
+            print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
+        self.switchPlayer()
+>>>>>>> f9e7e1058c3e87b33eac8d51181fe2de5ddd3696
 
+
+
+    def switchPlayer(self):
         self.turn_count += 1
-        self.turn = 3 - self.turn # 2 changes to 1, and vice versa
+        self.turn = 3 - self.turn
         if self.state == 'p1_turn':
             self.state = 'p2_turn'
         else:
             self.state = 'p1_turn'
-
-    def checkWin(self, tempBoard, player_num):
-        if tempBoard.finished[player_num-1] and tempBoard.score[player_num] > tempBoard.score[player_num-1]:
+    
+    def checkWin(self, tempBoard):
+        if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
             return True
         return False
 
 
-    def calculateBoard(self, board, move, player_num):
+    def calculateBoard(self, board, move):
         return board.score
-        pass
 
-    def lookahead(self, board, depth, lastmove, player_num):
+    def lookahead(self, board, depth, lastmove):
         if depth==0:
-            return board.calculateBoard(board, lastmove, player_num-1)
+            return board.calculateBoard(board, lastmove, player_num)
         else:
             move_list = board.calculateLegalMoves()
             best_val = -9999
@@ -305,7 +312,7 @@ class Board:
                     best_val = val
             return (-1*best_val)
 
-    def smartTurn(self, level, player_num):
+    def smartTurn(self, level):
         move_list = self.calculateLegalMoves()
         random.shuffle(move_list)
         best_val = -10001
@@ -313,10 +320,10 @@ class Board:
         for my_move in move_list:
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
-            
-            if self.checkWin(tempBoard, player_num):
+            if tempBoard.checkWin(tempBoard):
                 return (my_move)
-            val = self.lookahead(tempBoard, level, my_move, player_num)
+            tempBoard.switchPlayer()
+            val = self.lookahead(tempBoard, level, my_move)
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)

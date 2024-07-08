@@ -155,3 +155,9 @@ def generateCorners(piece_):
                 if n == 'NE': NE.append([i, j])
                 if n == 'SE': SE.append([i, j])
     return [NE, SE, SW, NW]
+
+
+#Below will be for the player actions.
+
+def playerchoosepiece():
+  
