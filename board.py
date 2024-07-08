@@ -1,6 +1,8 @@
 import random
 import copy
 
+random.seed(32)
+
 PLAYERS = {
     1: 'human',
     2: 'random'   
@@ -282,16 +284,31 @@ class Board:
         return False
 
 
-    def calculateBoard(self):
+    def calculateBoard(self, board, move, player_num):
+        return board.score
         pass
 
-    def lookahead(self, tempBoard, depth, lastmove):
-        pass
+    def lookahead(self, board, depth, lastmove, player_num):
+        if depth==0:
+            return board.calculateBoard(board, lastmove, player_num-1)
+        else:
+            move_list = board.calculateLegalMoves()
+            best_val = -9999
+            for my_move in move_list:
+                tempBoard = copy.deepcopy(board)
+                player_num = 3 - player_num
+                tempBoard.placePiece(my_move)
+                if board.checkwin(tempBoard,my_move):
+                    return (-10000)
+                val = tempBoard.lookahead(tempBoard,depth-1,my_move)
+                if val > best_val:
+                    best_val = val
+            return (-1*best_val)
 
     def smartTurn(self, level, player_num):
         move_list = self.calculateLegalMoves()
         random.shuffle(move_list)
-        best_val = -1000001
+        best_val = -10001
         best_move = []
         for my_move in move_list:
             tempBoard = copy.deepcopy(self)
@@ -301,10 +318,10 @@ class Board:
                 return (my_move)
             val = self.lookahead(tempBoard, level, my_move, player_num)
             if val > best_val:
-                bestval = val
-                bestmove = copy.copy(my_move)
+                best_val = val
+                best_move = copy.copy(my_move)
             
-        return (bestmove)
+        return best_move
     
     # UI, etc. for a human to be able to play a piece
     def humanTurn(self):
