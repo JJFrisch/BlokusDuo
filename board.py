@@ -267,19 +267,16 @@ class Board:
         starting_pos = [[4,4], [9,9]]
         w1 = 20
         w2 = 5 - math.log(0.001 * board.turn_count)
-        w3 = 0.5
-        w4 = 2
-        w5 = 5 - math.log(0.001 * board.turn_count)
-        w6 = 0.5
-        w7 = 1
+        w3 = 0.1
+        w4 = 0.5
+        w5 = 1 - math.log(0.001 * board.turn_count)
+        w6 = 0.1
+        w7 = 7
         # w8 = 1.2
-
-        # if board.turn_count <= -9:
-        #     pass
 
         if True:
             for opp_dot in board.possible_squares[2 - self.turn]:
-                score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                score -= w1 #+ w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[self.turn-1]:
                 score += w4 #+ w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
@@ -322,9 +319,9 @@ class Board:
         print(len(move_list))
         best_val = -10001
         best_move = []
-        ind = 1
+        # ind = 1
         for my_move in move_list:
-            print(ind)
+            # print(ind)
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
@@ -334,7 +331,7 @@ class Board:
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
-            ind += 1
+            # ind += 1
         return best_move
 
     def playSmart(self, level): #JF
