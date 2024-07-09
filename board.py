@@ -116,11 +116,14 @@ class Board:
         return corners
 
     def check_possible_squares(self):
-        new_possible_squares = []
+        new_possible_squares = [[], []]
         for possible_square in self.possible_squares[self.turn-1]:
             if self.is_valid_to_place_here(possible_square[0], possible_square[1]):
-                new_possible_squares.append(possible_square)
-
+                new_possible_squares[self.turn-1].append(possible_square)
+                
+        for possible_square in self.possible_squares[2-self.turn]:
+            if self.board[possible_square[1]][possible_square[0]] != self.turn:
+                new_possible_squares[2-self.turn].append(possible_square)
         return new_possible_squares
 
     def getEdges(self, x, y):
@@ -211,7 +214,7 @@ class Board:
 
         # update the possible squares
         #check the existing possible squares in case they are no longer placeable
-        self.possible_squares[self.turn-1] = self.check_possible_squares()
+        self.possible_squares = self.check_possible_squares()
         # add in the new avalible possible squares
         NE,SE,SW,NW = self.pieces[piece_num][orientation_number][1:]
         for dir in range(4):
@@ -269,7 +272,7 @@ class Board:
         score = 0
         starting_pos = [[4,4], [9,9]]
         w1 = 20
-        w2 = 5 - math.log(0.001 * board.turn_count)
+        w2 = 10 - math.log(0.001 * board.turn_count)
         w3 = 0.1
         w4 = 0.5
         w5 = 1 - math.log(0.001 * board.turn_count)
@@ -277,16 +280,20 @@ class Board:
         w7 = 7
         # w8 = 1.2
 
-        if True:
+        if board.turn_count >= 28:
+            score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
+        
+        else:
             for opp_dot in board.possible_squares[2 - self.turn]:
-                score -= w1 #+ w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[self.turn-1]:
-                score += w4 #+ w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                score += w4 + w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
                 score += w6 * sum(my_dot[2])
 
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
             # add in score += w8 * (total_inv_score - current_inv_score)
+            
         return score
 
     def calculateBoardScore_squares(self, board): #JF
@@ -305,7 +312,7 @@ class Board:
         else:
             # print(depth)
             board.switchPlayer()
-            move_list = board.calculateLegalMoves(only_fives_rounds=10)
+            move_list = board.calculateLegalMoves(only_fives_rounds=6)
             best_val = -9999
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
@@ -317,8 +324,41 @@ class Board:
                     best_val = val
             return (-1*best_val)
 
+    def minimax(self, board, depth, isMaximizingPlayer, alpha, beta):
+        # print(depth)
+        if depth == 0:
+            return board.calculateBoardScore_dots(board)
+        
+        if isMaximizingPlayer:
+            move_list = board.calculateLegalMoves(only_fives_rounds=6)
+            best_val = -9999
+            for my_move in move_list:
+                tempBoard = copy.deepcopy(board)
+                tempBoard.place_piece(my_move)
+                tempBoard.switchPlayer()
+                value = board.minimax(tempBoard, depth-1, False, alpha, beta)
+                best_val = max( best_val, value) 
+                alpha = max( alpha, best_val)
+                if beta <= alpha:
+                    break
+            return best_val
+
+        else:
+            move_list = board.calculateLegalMoves(only_fives_rounds=6)
+            best_val = 9999
+            for my_move in move_list:
+                tempBoard = copy.deepcopy(board)
+                tempBoard.place_piece(my_move)
+                tempBoard.switchPlayer()
+                value = board.minimax(tempBoard, depth-1, True, alpha, beta)
+                best_val = min( best_val, value) 
+                beta = min( beta, best_val)
+                if beta <= alpha:
+                    break
+            return best_val
         
     def smartTurn(self, level): #JF
+        # print('hello')
         move_list = self.calculateLegalMoves(only_fives_rounds=4)
         random.shuffle(move_list)
         print(len(move_list))
@@ -332,7 +372,8 @@ class Board:
             if tempBoard.checkWin(tempBoard):
                 print(my_move)
                 return (my_move)
-            val = self.lookahead(tempBoard, level)
+            # val = self.lookahead(tempBoard, level)
+            val = self.minimax(tempBoard, level, True, 99999, -99999)
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)

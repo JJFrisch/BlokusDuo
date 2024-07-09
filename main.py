@@ -23,15 +23,24 @@ while board.running:
       board.print()
 
   if board.state == 'p2_turn':
+      
+    poss_moves = len(board.calculateLegalMoves())
     print(board.turn_count)
-    if board.turn_count > 17:
-      board.playSmart(1)
-    if board.turn_count > 22:
-      board.playSmart(2)
-    if board.turn_count > 25:
+    
+    if board.turn_count < 5:
+      board.playSmart(0)
+    elif poss_moves < 50:
+      board.playSmart(7)
+    elif poss_moves < 100:
+      board.playSmart(5)
+    elif poss_moves < 200:
       board.playSmart(3)
+    elif poss_moves < 500:
+      board.playSmart(2)
     else:
       board.playSmart(0)
+      
+      
     if PRINT_BOARD:
       board.print()
     # print("pieces left:", board.inv[1])
