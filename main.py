@@ -25,7 +25,7 @@ while board.running:
   if board.state == 'p2_turn':
       
     poss_moves = len(board.calculateLegalMoves())
-    print(board.turn_count)
+    print("Turn: ", board.turn_count)
     
     if board.turn_count < 5:
       board.playSmart(0)

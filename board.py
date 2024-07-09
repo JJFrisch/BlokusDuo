@@ -237,7 +237,6 @@ class Board:
         
     def randomTurn(self): #JF
         all_moves = self.calculateLegalMoves(only_fives_rounds=3)
-        # print(all_moves)
 
         if all_moves != []:
             move = random.choice(all_moves)
