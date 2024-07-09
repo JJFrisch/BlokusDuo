@@ -174,7 +174,7 @@ class Board:
                 if self.turn not in self.getEdgesValues(x,y):
                     # print('edges check out: none of them are same team')
                     for piece_num in self.inv[self.turn-1]:
-                        if self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4:
+                        if (self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
                             for orientation_number in piece_possible_orientations[piece_num]:
                                 # print("checking this orientation now:", orientation_number)
                                 orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
@@ -265,25 +265,24 @@ class Board:
     def calculateBoardScore_dots(self, board): #JF
         score = 0
         starting_pos = [[4,4], [9,9]]
-        w1 = 2
-        w2 = 6 - math.log(10 * board.turn_count)
-        w3 = 2
+        w1 = 20
+        w2 = 5 - math.log(0.001 * board.turn_count)
+        w3 = 0.5
         w4 = 2
-        w5 = 6 - math.log(10 * board.turn_count)
-        w6 = 2
-        w7 = 5
+        w5 = 5 - math.log(0.001 * board.turn_count)
+        w6 = 0.5
+        w7 = 1
         # w8 = 1.2
 
-        
-        if board.turn_count <= -9:
-            pass
+        # if board.turn_count <= -9:
+        #     pass
 
-        else:
+        if True:
             for opp_dot in board.possible_squares[2 - self.turn]:
                 score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[self.turn-1]:
-                # score += w4 + w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                score += w4 #+ w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
                 score += w6 * sum(my_dot[2])
 
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
@@ -292,17 +291,20 @@ class Board:
 
     def calculateBoardScore_squares(self, board): #JF
         score = 0
-
-        return score
+        w1 = 1
+        w2 = 1
+        w3 =  0
+        score += w1 * board.score[self.turn-1]
+        score -= w2 * board.score[2-self.turn]
+        return score 
 
     def lookahead(self, board, depth): #JF
-        if depth == 1:
-            print(depth)
         if depth == 0:
             return board.calculateBoardScore_dots(board)
         else:
+            # print(depth)
             board.switchPlayer()
-            move_list = board.calculateLegalMoves(only_fives_rounds=4)
+            move_list = board.calculateLegalMoves(only_fives_rounds=10)
             best_val = -9999
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
@@ -317,9 +319,12 @@ class Board:
     def smartTurn(self, level): #JF
         move_list = self.calculateLegalMoves(only_fives_rounds=4)
         random.shuffle(move_list)
+        print(len(move_list))
         best_val = -10001
         best_move = []
+        ind = 1
         for my_move in move_list:
+            print(ind)
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
@@ -329,6 +334,7 @@ class Board:
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
+            ind += 1
         return best_move
 
     def playSmart(self, level): #JF

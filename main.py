@@ -1,57 +1,50 @@
 from board import Board
 from orient import generatePiecesDict, pieces
 
-import csv
-from collections import Counter
-# import pandas as pd
-
 PRINT_BOARD = True
-
-# generateCorners(pieces[13][0][0])
-# generatePiecesFromBlockPos()
-
 pieces = generatePiecesDict(pieces)  
-
-
-#read from file to get the pieces arrays
 board = Board(14, pieces)   
 
 if PRINT_BOARD:
   board.print()
 
-scores = []
-piecesPlaced = Counter()
-
-for x in range(1):
-  board = Board(14, pieces)
-  while board.running:
-
-    # break
-    # run the first turn
-    
-    if board.state == 'p1_turn':
-      
-      board.randomTurn()
-      if PRINT_BOARD:
-        board.print()
-      # print("pieces left:", board.inv[0])
+board = Board(14, pieces)
+while board.running:
   
-    if board.state == 'p2_turn':
-      
-      board.playSmart(1)
-      if PRINT_BOARD:
-        board.print()
-      # print("pieces left:", board.inv[1])
+  print(board.finished)
+  # break
+  # run the first turn
+  
+  if board.state == 'p1_turn':
+    
+    board.randomTurn()
+    if PRINT_BOARD:
+      board.print()
 
-    if board.finished == [True,True]:
-      board.displayStateOfGame()
-      # scores.append((board.score[0], board.score[1]))
-      # for inv in board.inv:
-      #   for piece in inv:
-      #     piecesPlaced[piece+1] += 1
-      # board.state = 'end'
-      # print(str(x) + " completed")
-      break
+  if board.state == 'p2_turn':
+    print(board.turn_count)
+    if board.turn_count > 17:
+      board.playSmart(1)
+    if board.turn_count > 22:
+      board.playSmart(2)
+    if board.turn_count > 25:
+      board.playSmart(3)
+    else:
+      board.playSmart(0)
+    if PRINT_BOARD:
+      board.print()
+    # print("pieces left:", board.inv[1])
+
+  if board.finished == [True,True]:
+    board.displayStateOfGame()
+    print("The number of rounds played is:", board.turn_count)
+    # scores.append((board.score[0], board.score[1]))
+    # for inv in board.inv:
+    #   for piece in inv:
+    #     piecesPlaced[piece+1] += 1
+    # board.state = 'end'
+    # print(str(x) + " completed")
+    break
 
 # print(scores)
 # print(piecesPlaced)
