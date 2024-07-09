@@ -1,7 +1,8 @@
 import random
 import copy
+import math
 
-random.seed(32)
+# random.seed(32)
 
 PLAYERS = {
     1: 'human',
@@ -248,17 +249,7 @@ class Board:
 
 
 
-    def firstRandomTurn(self):
-        # generate a random move that covers (4,4)
-        all_moves = self.calculateFirstLegalMoves()
-
-        if all_moves != []:
-            move = random.choice(all_moves)
-            self.place_piece(move)
-        # else:
-        #     print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
-    
-    def randomTurn(self):
+    def randomTurn(self): #JF
         all_moves = self.calculateLegalMoves()
         # print(all_moves)
 
@@ -268,17 +259,16 @@ class Board:
         else:
             self.finished[self.turn-1] = True
             # print(self.finished, self.turn)
-<<<<<<< HEAD
             # print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
             # print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
-=======
-            print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
+
         self.switchPlayer()
->>>>>>> f9e7e1058c3e87b33eac8d51181fe2de5ddd3696
 
+    def displayStateOfGame(self): #JF
+        print(self.score, " Player 1 and Player 2 scores")
+        print(self.inv, " Player 1 and Player 2 inventories")
 
-
-    def switchPlayer(self):
+    def switchPlayer(self): #JF
         self.turn_count += 1
         self.turn = 3 - self.turn
         if self.state == 'p1_turn':
@@ -286,33 +276,63 @@ class Board:
         else:
             self.state = 'p1_turn'
     
-    def checkWin(self, tempBoard):
+    def checkWin(self, tempBoard): #JF
         if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
             return True
         return False
 
 
-    def calculateBoard(self, board, move):
-        return board.score
+    def calculateBoardScore_dots(self, board): #JF
+        score = 0
+        starting_pos = [[4,4], [9,9]]
+        w1 = 2
+        w2 = 6 - math.log(10 * board.turn_count)
+        w3 = 2
+        w4 = 2
+        w5 = 6 - math.log(10 * board.turn_count)
+        w6 = 2
+        w7 = 5
+        # w8 = 1.2
 
-    def lookahead(self, board, depth, lastmove):
-        if depth==0:
-            return board.calculateBoard(board, lastmove, player_num)
+        
+        if board.turn_count <= -9:
+            pass
+
         else:
+            for opp_dot in board.possible_squares[2 - self.turn]:
+                score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                score -= w3 * sum(opp_dot[2])
+            for my_dot in board.possible_squares[self.turn-1]:
+                # score += w4 + w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                score += w6 * sum(my_dot[2])
+
+            score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
+            # add in score += w8 * (total_inv_score - current_inv_score)
+        return score
+
+    def calculateBoardScore_squares(self, board): #JF
+        score = 0
+
+        return score
+
+    def lookahead(self, board, depth): #JF
+        if depth == 0:
+            return board.calculateBoardScore_dots(board)
+        else:
+            board.switchPlayer()
             move_list = board.calculateLegalMoves()
             best_val = -9999
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
-                player_num = 3 - player_num
-                tempBoard.placePiece(my_move)
-                if board.checkwin(tempBoard,my_move):
+                tempBoard.place_piece(my_move)
+                if board.checkWin(tempBoard):
                     return (-10000)
-                val = tempBoard.lookahead(tempBoard,depth-1,my_move)
+                val = tempBoard.lookahead(tempBoard,depth-1)
                 if val > best_val:
                     best_val = val
             return (-1*best_val)
 
-    def smartTurn(self, level):
+    def smartTurn(self, level): #JF
         move_list = self.calculateLegalMoves()
         random.shuffle(move_list)
         best_val = -10001
@@ -321,17 +341,26 @@ class Board:
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
+                print(my_move)
                 return (my_move)
-            tempBoard.switchPlayer()
-            val = self.lookahead(tempBoard, level, my_move)
+            val = self.lookahead(tempBoard, level)
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
-            
         return best_move
+
+    def playSmart(self, level): #JF
+        best_move = self.smartTurn(level)
+        print(best_move)
+        if best_move == []:
+            self.finished[self.turn-1] = True
+        else:
+            self.place_piece(best_move)
+
+        self.switchPlayer()
     
     # UI, etc. for a human to be able to play a piece
-    def humanTurn(self):
+    def humanTurn(self): #JF
         legal_move = False
         while not legal_move:
             choice = int(input(f"Player {self.turn}'s turn. Choose a piece to place: "))

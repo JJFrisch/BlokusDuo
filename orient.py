@@ -159,5 +159,19 @@ def generateCorners(piece_):
 
 #Below will be for the player actions.
 
-def playerchoosepiece():
-  
+# def playerchoosepiece():
+#   piece_input = int(input("What piece do you want to play?: "))
+#   if piece_input > 0 and piece_input < 22:
+#     piece = pieces[piece_input]
+#     print (piece)
+#   else:
+#     print ("Not a valid piece.)
+#   if orient_input == 'R':
+#     new_piece = rotate(piece)
+#     print (new_piece)
+#   elif orient_input == 'N':
+#     playerchoosepiece()
+    
+# playerchoosepiece()
+#     playerchoosepiece()
+#   orient_input = input("Would you like to rotate or choose a new piece? (R/N)
