@@ -33,7 +33,7 @@ class Board:
         self.dim = s
         self.board = [[0 for i in range(s)] for j in range(s)]
         self.turn = 1
-        self.turn_count = 0
+        self.turn_count = 1
         self.finished = [False, False]
         
         # score is the # of tiles placed by each player
@@ -243,9 +243,6 @@ class Board:
             self.place_piece(move)
         else:
             self.finished[self.turn-1] = True
-            # print(self.finished, self.turn)
-            # print("inventory left: " + str(self.inv[self.turn-1]) + " and my score is: ")
-            # print("can't place any pieces. My turn is skipped. The inventory left is:", self.inv[self.turn-1], 'and my score is:', self.score[self.turn-1])
 
         self.switchPlayer()
 
@@ -309,7 +306,6 @@ class Board:
         if depth == 0:
             return board.calculateBoardScore_dots(board)
         else:
-            # print(depth)
             board.switchPlayer()
             move_list = board.calculateLegalMoves(only_fives_rounds=6)
             best_val = -9999
@@ -324,9 +320,10 @@ class Board:
             return (-1*best_val)
 
     def minimax(self, board, depth, isMaximizingPlayer, alpha, beta):
-        # print(depth)
         if depth == 0:
             return board.calculateBoardScore_dots(board)
+        # else:
+        #     board.switchPlayer()
         
         if isMaximizingPlayer:
             move_list = board.calculateLegalMoves(only_fives_rounds=6)
@@ -334,7 +331,7 @@ class Board:
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                tempBoard.switchPlayer()
+                board.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, False, alpha, beta)
                 best_val = max( best_val, value) 
                 alpha = max( alpha, best_val)
@@ -357,22 +354,19 @@ class Board:
             return best_val
         
     def smartTurn(self, level): #JF
-        # print('hello')
         move_list = self.calculateLegalMoves(only_fives_rounds=4)
         random.shuffle(move_list)
-        print(len(move_list))
+        print("Number of moves available: ", len(move_list))
         best_val = -10001
         best_move = []
         # ind = 1
         for my_move in move_list:
-            # print(ind)
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
-                print(my_move)
                 return (my_move)
             # val = self.lookahead(tempBoard, level)
-            val = self.minimax(tempBoard, level, True, 99999, -99999)
+            val = self.minimax(tempBoard, level, True, 999999, -999999)
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
@@ -382,7 +376,6 @@ class Board:
         
     def playSmart(self, level): #JF
         best_move = self.smartTurn(level)
-        print(best_move)
         if best_move == []:
             self.finished[self.turn-1] = True
         else:
