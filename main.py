@@ -1,6 +1,7 @@
 from board import Board
 from orient import generatePiecesDict, pieces
 
+
 PRINT_BOARD = True
 pieces = generatePiecesDict(pieces)  
 board = Board(14, pieces)   

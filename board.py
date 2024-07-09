@@ -2,6 +2,7 @@ import random
 import copy
 import math
 
+
 # random.seed(32)
 
 PLAYERS = {
@@ -164,6 +165,7 @@ class Board:
 
     
     # returns a list of all legal moves for current player's turn
+        
     def calculateLegalMoves(self, only_fives_rounds=0): #JF
        # check all corners of the current player
         legal_placements = []
@@ -193,6 +195,7 @@ class Board:
                                             legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
         return legal_placements
     
+        
     def place_piece(self, move): #JF
         # print(move)
         x, y, piece_num, orientation_number, poss_squares_i, dir = move
@@ -228,7 +231,7 @@ class Board:
         self.inv[self.turn-1].remove(piece_num)    
 
 
-
+        
     def randomTurn(self): #JF
         all_moves = self.calculateLegalMoves(only_fives_rounds=3)
         # print(all_moves)
@@ -261,7 +264,7 @@ class Board:
             return True
         return False
 
-
+        
     def calculateBoardScore_dots(self, board): #JF
         score = 0
         starting_pos = [[4,4], [9,9]]
@@ -295,6 +298,7 @@ class Board:
         score -= w2 * board.score[2-self.turn]
         return score 
 
+        
     def lookahead(self, board, depth): #JF
         if depth == 0:
             return board.calculateBoardScore_dots(board)
@@ -313,6 +317,7 @@ class Board:
                     best_val = val
             return (-1*best_val)
 
+        
     def smartTurn(self, level): #JF
         move_list = self.calculateLegalMoves(only_fives_rounds=4)
         random.shuffle(move_list)
@@ -334,6 +339,7 @@ class Board:
             # ind += 1
         return best_move
 
+        
     def playSmart(self, level): #JF
         best_move = self.smartTurn(level)
         print(best_move)
