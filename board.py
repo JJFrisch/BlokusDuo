@@ -164,7 +164,7 @@ class Board:
 
     
     # returns a list of all legal moves for current player's turn
-    def calculateLegalMoves(self): #JF
+    def calculateLegalMoves(self, only_fives_rounds=0): #JF
        # check all corners of the current player
         legal_placements = []
         for poss_squares_index in range(len(self.possible_squares[self.turn-1])):#[x,y,[NE,SE,SW,NW]] in self.possible_squares[self.turn-1]:
@@ -174,43 +174,23 @@ class Board:
                 if self.turn not in self.getEdgesValues(x,y):
                     # print('edges check out: none of them are same team')
                     for piece_num in self.inv[self.turn-1]:
-                        for orientation_number in piece_possible_orientations[piece_num]:
-                            # print("checking this orientation now:", orientation_number)
-                            orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
-                            for dir in range(4):
-                                for pieceBlock in orientation[dir + 1]:
-                                    center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
-                                    if not self.is_valid_to_place_here(center[0], center[1]):
-                                        break
-                                    
-                                    for block in orientation[0]:
-                                        x_prime = block[0]+center[0]
-                                        y_prime = block[1]+center[1]                                            
-                                        if not self.is_valid_to_place_here(x_prime, y_prime):
+                        if self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4:
+                            for orientation_number in piece_possible_orientations[piece_num]:
+                                # print("checking this orientation now:", orientation_number)
+                                orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
+                                for dir in range(4):
+                                    for pieceBlock in orientation[dir + 1]:
+                                        center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
+                                        if not self.is_valid_to_place_here(center[0], center[1]):
                                             break
-                                    else:
-                                        legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
-        return legal_placements
-
-    def calculateFirstLegalMoves(self):
-        legal_placements = []
-        for poss_squares_index in range(len(self.possible_squares[self.turn-1])):#[x,y,[NE,SE,SW,NW]] in self.possible_squares[self.turn-1]:
-            x,y,[NE,SE,SW,NW] = self.possible_squares[self.turn-1][poss_squares_index]
-            if self.board[y][x] == 0:
-                if self.turn not in self.getEdges(x,y):
-                    for piece_num in self.inv[self.turn-1]:
-                        for orientation_number in piece_possible_orientations[piece_num-1]:
-                            orientation = self.pieces[piece_num][orientation_number]
-                            for dir in range(4):
-                                for piece_block in orientation[dir+1]:
-                                    center = [ x + (-1*piece_block[0]), y + (-1*piece_block[1]) ]
-                                    for block in orientation[0]:
-                                        x_prime = block[0]+center[0]
-                                        y_prime = block[1]+center[1]
-                                        if not self.is_valid_to_place_here(x_prime, y_prime):
-                                            break
-                                    else:
-                                        legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index])
+                                        
+                                        for block in orientation[0]:
+                                            x_prime = block[0]+center[0]
+                                            y_prime = block[1]+center[1]                                            
+                                            if not self.is_valid_to_place_here(x_prime, y_prime):
+                                                break
+                                        else:
+                                            legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
         return legal_placements
     
     def place_piece(self, move): #JF
@@ -250,7 +230,7 @@ class Board:
 
 
     def randomTurn(self): #JF
-        all_moves = self.calculateLegalMoves()
+        all_moves = self.calculateLegalMoves(only_fives_rounds=3)
         # print(all_moves)
 
         if all_moves != []:
@@ -316,11 +296,13 @@ class Board:
         return score
 
     def lookahead(self, board, depth): #JF
+        if depth == 1:
+            print(depth)
         if depth == 0:
             return board.calculateBoardScore_dots(board)
         else:
             board.switchPlayer()
-            move_list = board.calculateLegalMoves()
+            move_list = board.calculateLegalMoves(only_fives_rounds=4)
             best_val = -9999
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
@@ -333,7 +315,7 @@ class Board:
             return (-1*best_val)
 
     def smartTurn(self, level): #JF
-        move_list = self.calculateLegalMoves()
+        move_list = self.calculateLegalMoves(only_fives_rounds=4)
         random.shuffle(move_list)
         best_val = -10001
         best_move = []
