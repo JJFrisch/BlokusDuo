@@ -20,18 +20,18 @@ while board.running:
       
     poss_moves = len(board.calculateLegalMoves())
     
-    # board.playSmart(2)
+    board.playSmart_v2(2) #starts at 1 not 0
     
-    if poss_moves < 50:
-      board.playSmart(8)
-    elif poss_moves < 100:
-      board.playSmart(6)
-    elif poss_moves < 200:
-      board.playSmart(4)
-    elif poss_moves < 1700:
-      board.playSmart(2)
-    else:
-      board.playSmart(0)
+    # if poss_moves < 500:
+    #   board.playSmart_v2(0)
+    # elif poss_moves  100:
+    #   board.playSmart(6)
+    # elif poss_moves < 200:
+    #   board.playSmart(4)
+    # elif poss_moves < 1700:
+    #   board.playSmart(2)
+    # else:
+    #   board.playSmart(0)
 
     
   elif board.state == 'p2_turn':

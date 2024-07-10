@@ -323,6 +323,8 @@ class Board:
     def minimax(self, board, depth, isMaximizingPlayer, alpha, beta):
         if depth == 0:
             return board.calculateBoardScore_dots(board)
+        else:
+            board.switchPlayer()
 
         
         if isMaximizingPlayer:
@@ -331,7 +333,7 @@ class Board:
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                tempBoard.switchPlayer()
+                # tempBoard.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, False, alpha, beta)
                 best_val = max( best_val, value) 
                 alpha = max( alpha, best_val)
@@ -339,13 +341,13 @@ class Board:
                     break
             return best_val
 
-        else:
+        elif not isMaximizingPlayer:
             move_list = board.calculateLegalMoves(only_fives_rounds=6)
             best_val = 9999
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                tempBoard.switchPlayer()
+                # tempBoard.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, True, alpha, beta)
                 best_val = min( best_val, value) 
                 beta = min( beta, best_val)
@@ -366,14 +368,111 @@ class Board:
             if tempBoard.checkWin(tempBoard):
                 return (my_move)
 
-            val = self.minimax(tempBoard, level, True, 999999, -999999)
+            val = self.minimax(tempBoard, level, False, 999999, -999999)
                 
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
             # ind += 1
         return best_move
+    
+    def max_value(self, board, level, alpha, beta):
+        """
+        Returns the maximum value for the current player on the board 
+        using alpha-beta pruning.
+        """
+        
+        if level == 0:
+            return board.calculateBoardScore_dots(board)
+        
+        val = -math.inf
+        for move in board.calculateLegalMoves():
+            val = max(val, board.min_value(board.result(board, move), level-1, alpha, beta))
+            alpha = max(alpha, val)
+            if alpha >= beta:
+                print('PRUNING!!!')
+                print('PRUNING!!!')
+                print('PRUNING!!!')
+                print('PRUNING!!!')
+                break
+            
+        return val
+            
+    def min_value(self, board, level, alpha, beta):
+        """
+        Returns the maximum value for the current player on the board 
+        using alpha-beta pruning.
+        """
+        if level == 0:
+            return board.calculateBoardScore_dots(board)
+        
+        val = math.inf
+        for move in board.calculateLegalMoves():
+            val = min(val, board.max_value(board.result(board, move), level-1, alpha, beta))
+            beta = min(alpha, val) 
+            if alpha >= beta:
+                print('PRUNING!!!')
+                print('PRUNING!!!')
+                print('PRUNING!!!')
+                break
+            
+        return val
+        
+    def result(self, board, move):
+        if move not in board.calculateLegalMoves():
+            print("How did this move get here???")
+            raise Exception("Invalid Action")
+        
+        tempBoard = copy.deepcopy(board)
+        tempBoard.place_piece(move)
+        tempBoard.switchPlayer()
+        
+        return tempBoard
+    
+    def minimax_v2(self, board, level, isMaximizingPlayer):
+        print(level, level==0)
+        if level == 0:
+            return 
+        
+        if isMaximizingPlayer:
+            val = -math.inf
+            best_move = []
+            
+            for move in board.calculateLegalMoves():
+                new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf)
+                if new_val > val:
+                    val = new_val
+                    best_move = move
+                    
+        elif not isMaximizingPlayer:
+            val = math.inf
+            best_move = []
+            print(len(board.calculateLegalMoves()))
+            i = 0
+            for move in board.calculateLegalMoves():
+                new_val = board.max_value(board.result(board, move), level-1, -math.inf, math.inf)
+                print(i, new_val, val, "wheres the error")
+                if new_val < val:
+                    val = new_val
+                    best_move = move
+                i+=1
+             
+        print(best_move)       
+        return best_move
+            
 
+    def playSmart_v2(self, level):
+        tempBoard = copy.deepcopy(self)
+        move = self.minimax_v2(tempBoard, level, False)
+        print(move)
+        if move not in self.calculateLegalMoves():
+            print("How did this move get here???")
+            raise Exception("Invalid Action")
+        
+        self.place_piece(move)
+        self.switchPlayer()
+        
+    
         
     def playSmart(self, level): #JF
         best_move = self.smartTurn(level)
