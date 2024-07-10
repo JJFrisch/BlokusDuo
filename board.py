@@ -51,6 +51,7 @@ class Board:
             [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20] #player 2
         ]
         
+        self.piece_diff_ord = [13, 17, 15, 19, 16, 12, 14]
 
         self.pieces = pieces
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
@@ -198,6 +199,37 @@ class Board:
                                             legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
         return legal_placements
     
+    
+    def calculateLegalMovesEarly(self, number_of_pieces, only_fives_rounds=0): #JF
+        # check all corners of the current player
+        piece_diff_ord = self.piece_diff_ord[:number_of_pieces]
+        piece_diff_ord = list(set(piece_diff_ord) & set(self.inv[self.turn-1]))
+        legal_placements = []
+        for poss_squares_index in range(len(self.possible_squares[self.turn-1])):#[x,y,[NE,SE,SW,NW]] in self.possible_squares[self.turn-1]:
+            x,y,[NE,SE,SW,NW] = self.possible_squares[self.turn-1][poss_squares_index]
+            if self.board[y][x] == 0:
+                # print(x,y,[NE,SE,SW,NW], "this is one choice")
+                if self.turn not in self.getEdgesValues(x,y):
+                    # print('edges check out: none of them are same team')
+                    for piece_num in piece_diff_ord:
+                        if (self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
+                            for orientation_number in piece_possible_orientations[piece_num]:
+                                # print("checking this orientation now:", orientation_number)
+                                orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
+                                for dir in range(4):
+                                    for pieceBlock in orientation[dir + 1]:
+                                        center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
+                                        if not self.is_valid_to_place_here(center[0], center[1]):
+                                            break
+                                        
+                                        for block in orientation[0]:
+                                            x_prime = block[0]+center[0]
+                                            y_prime = block[1]+center[1]                                            
+                                            if not self.is_valid_to_place_here(x_prime, y_prime):
+                                                break
+                                        else:
+                                            legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
+        return legal_placements
         
     def place_piece(self, move): #JF
         # print(move)
@@ -268,28 +300,34 @@ class Board:
         # w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 = weights
         score = 0
         starting_pos = [[4,4], [9,9]]
-        w1 = 12 #* math.sqrt(50-board.turn)
-        w2 = 1.5 - math.log(0.001 * board.turn_count)
-        w3 = 0.1
-        w4 = 10
-        w5 = 1 - math.log(0.001 * board.turn_count)
-        w6 = 0.1
-        w7 = 15
-        # w8 = 1.2
+        if board.turn_count < 20:
+            w1 = 4 # stay between 1-10, prolly lower like 2-5
+        else:
+            w1 = 2
+        w2 = 1.5 - math.log(0.001 * board.turn_count) #the front stays very low
+        w3 = 1
+        w4 = 3
+        w5 = 1.5 - math.log(0.001 * board.turn_count) #the front stays very low
+        w6 = 1
+        w7 = 5
+        
+        w8 = 7
+        
 
         if board.turn_count >= 25:
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
         
         else:
             for opp_dot in board.possible_squares[2 - self.turn]:
-                score -= w1 #+ w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[self.turn-1]:
-                score += w4 #+ w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                score += w4 + w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
                 score += w6 * sum(my_dot[2])
 
-            score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
-            # add in score += w8 * (total_inv_score - current_inv_score)
+            score += w7 * board.score[self.turn-1]
+            score -= w8 * board.score[2-board.turn]
+            # add in score += w9 * (total_inv_score - current_inv_score)
             
         return score
 
@@ -361,19 +399,17 @@ class Board:
         print("Number of moves available: ", len(move_list))
         best_val = -10001
         best_move = []
-        # ind = 1
         for my_move in move_list:
             tempBoard = copy.deepcopy(self)
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
                 return (my_move)
-
+            
             val = self.minimax(tempBoard, level, False, 999999, -999999)
                 
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
-            # ind += 1
         return best_move
     
     def max_value(self, board, level, alpha, beta):
@@ -386,14 +422,10 @@ class Board:
             return board.calculateBoardScore_dots(board)
         
         val = -math.inf
-        for move in board.calculateLegalMoves():
+        for move in board.calculateLegalMoves(6):
             val = max(val, board.min_value(board.result(board, move), level-1, alpha, beta))
             alpha = max(alpha, val)
             if alpha >= beta:
-                print('PRUNING!!!')
-                print('PRUNING!!!')
-                print('PRUNING!!!')
-                print('PRUNING!!!')
                 break
             
         return val
@@ -407,13 +439,10 @@ class Board:
             return board.calculateBoardScore_dots(board)
         
         val = math.inf
-        for move in board.calculateLegalMoves():
+        for move in board.calculateLegalMoves(6):
             val = min(val, board.max_value(board.result(board, move), level-1, alpha, beta))
             beta = min(alpha, val) 
             if alpha >= beta:
-                print('PRUNING!!!')
-                print('PRUNING!!!')
-                print('PRUNING!!!')
                 break
             
         return val
@@ -434,42 +463,58 @@ class Board:
         if level == 0:
             return 
         
+        # will only look at the hard to place 5 peices as options for the first 2 turns
+        if board.turn_count <= 4:
+            moves = board.calculateLegalMovesEarly(2)
+        else:
+            moves = board.calculateLegalMoves(6)
+        
+        print(len(moves), len(moves)**level, ": thats how many moves and how many possibilities based on depth")
+        i = 1
         if isMaximizingPlayer:
             val = -math.inf
             best_move = []
-            
-            for move in board.calculateLegalMoves():
+            for move in moves:
+                if i % 100 == 0:
+                    print(i)
                 new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf)
                 if new_val > val:
                     val = new_val
                     best_move = move
+                i += 1
                     
         elif not isMaximizingPlayer:
             val = math.inf
             best_move = []
-            print(len(board.calculateLegalMoves()))
-            i = 0
-            for move in board.calculateLegalMoves():
+            for move in moves:
+                if i % 100 == 0:
+                    print(i)
                 new_val = board.max_value(board.result(board, move), level-1, -math.inf, math.inf)
-                print(i, new_val, val, "wheres the error")
                 if new_val < val:
                     val = new_val
                     best_move = move
-                i+=1
+                
+                i += 1
              
-        print(best_move)       
         return best_move
             
 
     def playSmart_v2(self, level):
         tempBoard = copy.deepcopy(self)
-        move = self.minimax_v2(tempBoard, level, False)
+        if level % 2 == 0:
+            move = self.minimax_v2(tempBoard, level, True)
+        elif level % 2 == 1:
+            move = self.minimax_v2(tempBoard, level, False)
         print(move)
-        if move not in self.calculateLegalMoves():
-            print("How did this move get here???")
-            raise Exception("Invalid Action")
+        # if move not in self.calculateLegalMoves():
+        #     print("How did this move get here???")
+        #     raise Exception("Invalid Action")
         
-        self.place_piece(move)
+        if move == []:
+            self.finished[self.turn-1] = True
+        else:
+            self.place_piece(move)
+            
         self.switchPlayer()
         
     
