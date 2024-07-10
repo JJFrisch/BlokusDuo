@@ -259,7 +259,7 @@ class Board:
             self.state = 'p1_turn'
     
     def checkWin(self, tempBoard): #JF
-        if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
+        if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[2-tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
             return True
         return False
 
@@ -267,24 +267,24 @@ class Board:
     def calculateBoardScore_dots(self, board): #JF
         score = 0
         starting_pos = [[4,4], [9,9]]
-        w1 = 20
-        w2 = 10 - math.log(0.001 * board.turn_count)
+        w1 = 10 * (100-board.turn*2)
+        w2 = 2 - math.log(0.001 * board.turn_count)
         w3 = 0.1
-        w4 = 0.5
-        w5 = 1 - math.log(0.001 * board.turn_count)
+        w4 = 8
+        w5 = 2 - math.log(0.001 * board.turn_count)
         w6 = 0.1
-        w7 = 7
+        w7 = 20
         # w8 = 1.2
 
-        if board.turn_count >= 28:
+        if board.turn_count >= 25:
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
         
         else:
             for opp_dot in board.possible_squares[2 - self.turn]:
-                score -= w1 + w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                score -= w1 #+ w2 * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[self.turn-1]:
-                score += w4 + w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                score += w4 #+ w5 * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
                 score += w6 * sum(my_dot[2])
 
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])

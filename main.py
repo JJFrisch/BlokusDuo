@@ -15,25 +15,18 @@ while board.running:
   # break
   # run the first turn
   
-  if board.state == 'p1_turn':
+  if board.state == 'p2_turn':
     
     if PRINT_BOARD:
       board.print()
       
-      
-    board.randomTurn()
+    # board.randomTurn()
     poss_moves = len(board.calculateLegalMoves())
     
-    # board.playSmart(0)
-    
-
-  elif board.state == 'p2_turn':
-      
-    poss_moves = len(board.calculateLegalMoves())
-    print("Turn: ", board.turn_count)
-    
+    board.playSmart(0)
+    print(board.turn)
     if board.turn_count < 3:
-      board.playSmart(0)
+      board.playSmart(1)
     elif poss_moves < 50:
       board.playSmart(7)
     elif poss_moves < 100:
@@ -46,6 +39,20 @@ while board.running:
       board.playSmart(1)
     else:
       board.playSmart(0)
+      
+    # if board.turn_count > 4:
+    #   break
+    
+  elif board.state == 'p1_turn':
+      
+    poss_moves = len(board.calculateLegalMoves())
+    print("Turn: ", board.turn_count)
+    
+    board.playSmart(0)
+    # board.randomTurn()
+    
+    # if board.turn_count > 4:
+    #   break
       
       
     if PRINT_BOARD:
