@@ -6,8 +6,6 @@ PRINT_BOARD = True
 pieces = generatePiecesDict(pieces)  
 board = Board(14, pieces)   
 
-
-board = Board(14, pieces)
 while board.running:
   
   print()
@@ -15,44 +13,35 @@ while board.running:
   # break
   # run the first turn
   
-  if board.state == 'p2_turn':
+  if board.state == 'p1_turn':
     
     if PRINT_BOARD:
       board.print()
       
-    # board.randomTurn()
     poss_moves = len(board.calculateLegalMoves())
     
-    board.playSmart(0)
-    print(board.turn)
-    if board.turn_count < 3:
-      board.playSmart(1)
-    elif poss_moves < 50:
-      board.playSmart(7)
+    # board.playSmart(2)
+    
+    if poss_moves < 50:
+      board.playSmart(8)
     elif poss_moves < 100:
-      board.playSmart(5)
+      board.playSmart(6)
     elif poss_moves < 200:
-      board.playSmart(3)
-    elif poss_moves < 500:
+      board.playSmart(4)
+    elif poss_moves < 1700:
       board.playSmart(2)
-    elif poss_moves < 1000:
-      board.playSmart(1)
     else:
       board.playSmart(0)
-      
-    # if board.turn_count > 4:
-    #   break
+
     
-  elif board.state == 'p1_turn':
+  elif board.state == 'p2_turn':
       
     poss_moves = len(board.calculateLegalMoves())
     print("Turn: ", board.turn_count)
     
     board.playSmart(0)
     # board.randomTurn()
-    
-    # if board.turn_count > 4:
-    #   break
+
       
       
     if PRINT_BOARD:

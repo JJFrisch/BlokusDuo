@@ -3,7 +3,7 @@ import copy
 import math
 
 
-# random.seed(32)
+random.seed(32)
 
 PLAYERS = {
     1: 'human',
@@ -264,16 +264,17 @@ class Board:
         return False
 
         
-    def calculateBoardScore_dots(self, board): #JF
+    def calculateBoardScore_dots(self, board, weights = [10]): #JF
+        # w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 = weights
         score = 0
         starting_pos = [[4,4], [9,9]]
-        w1 = 10 * (100-board.turn*2)
-        w2 = 2 - math.log(0.001 * board.turn_count)
+        w1 = 12 #* math.sqrt(50-board.turn)
+        w2 = 1.5 - math.log(0.001 * board.turn_count)
         w3 = 0.1
-        w4 = 8
-        w5 = 2 - math.log(0.001 * board.turn_count)
+        w4 = 10
+        w5 = 1 - math.log(0.001 * board.turn_count)
         w6 = 0.1
-        w7 = 20
+        w7 = 15
         # w8 = 1.2
 
         if board.turn_count >= 25:
@@ -322,8 +323,7 @@ class Board:
     def minimax(self, board, depth, isMaximizingPlayer, alpha, beta):
         if depth == 0:
             return board.calculateBoardScore_dots(board)
-        # else:
-        #     board.switchPlayer()
+
         
         if isMaximizingPlayer:
             move_list = board.calculateLegalMoves(only_fives_rounds=6)
@@ -331,7 +331,7 @@ class Board:
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                board.switchPlayer()
+                tempBoard.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, False, alpha, beta)
                 best_val = max( best_val, value) 
                 alpha = max( alpha, best_val)
@@ -365,8 +365,9 @@ class Board:
             tempBoard.place_piece(my_move)
             if tempBoard.checkWin(tempBoard):
                 return (my_move)
-            # val = self.lookahead(tempBoard, level)
+
             val = self.minimax(tempBoard, level, True, 999999, -999999)
+                
             if val > best_val:
                 best_val = val
                 best_move = copy.copy(my_move)
