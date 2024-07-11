@@ -309,9 +309,9 @@ class Board:
         w4 = 3
         w5 = 1.5 - math.log(0.001 * board.turn_count) #the front stays very low
         w6 = 1
-        w7 = 5
+        w7 = 8
         
-        w8 = 7
+        w8 = 10
         
 
         if board.turn_count >= 25:
@@ -465,7 +465,7 @@ class Board:
         
         # will only look at the hard to place 5 peices as options for the first 2 turns
         if board.turn_count <= 4:
-            moves = board.calculateLegalMovesEarly(2)
+            moves = board.calculateLegalMovesEarly(6)
         else:
             moves = board.calculateLegalMoves(6)
         
@@ -542,13 +542,17 @@ class Board:
             y = int(input(f"Player {self.turn}'s turn. Choose the y coordinate of the piece: "))
             orientaion = int(input(f"Player {self.turn}'s turn. Choose the orientation of the piece: "))
             legal_move = self.is_valid_to_place_here(x,y)
-            if legal_move:
-                legal_move = self.is_legal_move(x, y, choice, orientaion)
-            if legal_move:
-                break
-            print("NOOOOOOOOOOOOOOOOOO try again")
+            move = [x, y, choice, orientaion, 0, 0]
+            # if legal_move:
+            #     legal_move = self.is_legal_move(x, y, choice, orientaion)
+            # if legal_move:
+            #     break
+            # print("NOOOOOOOOOOOOOOOOOO try again")
 
-        self.place_piece(x, y, choice, orientaion)
+        self.place_piece(move)
+        print(self.inv[self.turn-1])
+        print(self.score)
+        self.switchPlayer()
 
 
         def squareDiff(self): 

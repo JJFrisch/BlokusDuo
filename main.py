@@ -9,39 +9,47 @@ board = Board(14, pieces)
 while board.running:
   
   print()
-  print(board.finished)
-  # break
-  # run the first turn
+  print(board.finished, board.score)
+
+  poss_moves = len(board.calculateLegalMoves())
+  print("Turn: ", board.turn_count)
   
   if board.state == 'p1_turn':
     
     if PRINT_BOARD:
       board.print()
-      
-    poss_moves = len(board.calculateLegalMoves())
-    
-    # board.playSmart_v2(3)
+          
     if poss_moves > 400:
       board.playSmart_v2(1)
+    elif poss_moves > 100:
+      board.playSmart_v2(2)
     else:
       board.playSmart_v2(3)
+
+
+    
+    # board.playSmart(0)
 
     
   elif board.state == 'p2_turn':
       
-    poss_moves = len(board.calculateLegalMoves())
-    print("Turn: ", board.turn_count)
-    
-    if poss_moves > 400:
-      board.playSmart(0)
-    else:
-      board.playSmart(2)
-
-      
-      
     if PRINT_BOARD:
       board.print()
-    # print("pieces left:", board.inv[1])
+    
+    
+    board.playSmart(0)
+    # board.randomTurn()
+    # board.humanTurn()
+    
+    # if poss_moves > 400:
+    #   board.playSmart(0)
+    # elif poss_moves > 100:
+    #   board.playSmart(1)
+    # else:
+    #   board.playSmart(2)
+
+
+
 
   if board.finished == [True,True]:
     board.displayStateOfGame()
