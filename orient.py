@@ -174,4 +174,4 @@ def generateCorners(piece_):
     
 # playerchoosepiece()
 #     playerchoosepiece()
-#   orient_input = input("Would you like to rotate or choose a new piece? (R/N)
+#   orient_input = input("Would you like to rotate or choose a new piece? (R/N))
