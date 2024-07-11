@@ -1,10 +1,35 @@
 from board import Board
 from orient import generatePiecesDict, pieces
+import math, random
 
 
 PRINT_BOARD = True
 pieces = generatePiecesDict(pieces)  
-board = Board(14, pieces)   
+board = Board(14, pieces)  
+# board.running = False
+
+def randWeights():
+  weights = []
+  w1 = random.uniform(0, 60)
+  w2 = random.uniform(0, 60)
+  w3 = random.uniform(0, 60)
+  w4 = random.uniform(0, 60)
+  w5 = random.uniform(0, 60)
+  w6 = random.uniform(0, 60)
+  w7 = random.uniform(0, 60)
+  w8 = random.uniform(0, 60)
+  w9 = random.uniform(0, 60)
+  
+  rounds_only_5s = random.randint(0,10)
+  rounds_choosing_only_difficult_pieces = random.randint(0,10)
+  num_of_difficult_pieces_included = random.randint(0,10)
+  
+  return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
+p1_weights = randWeights()
+print(p1_weights)
+p2_weights = [0.000001,0,0,0,0,0,0,00,0,0,4,6]
+p2_weights = randWeights()
+p2_weights = [5,1,1,3,1,1,8,12,0,0,4,6]
 
 while board.running:
   
@@ -19,12 +44,13 @@ while board.running:
     if PRINT_BOARD:
       board.print()
           
-    if poss_moves > 400:
-      board.playSmart_v2(2)
-    elif poss_moves >   100:
-      board.playSmart_v2(2)
+    if poss_moves > 0:
+      # print(p1_weights)
+      board.playSmart_v2(1, p1_weights)
+    elif poss_moves > 100:
+      board.playSmart_v2(2, p1_weights)
     else:
-      board.playSmart_v2(3)
+      board.playSmart_v2(3, p1_weights)
 
 
     # board.playSmart_v2(2)
@@ -37,7 +63,7 @@ while board.running:
       board.print()
     
     
-    board.playSmart(0)
+    board.playSmart(0, p2_weights)
     # board.randomTurn()
     # board.humanTurn()
     
