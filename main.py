@@ -1,5 +1,6 @@
 from board import Board
 from orient import generatePiecesDict, pieces
+<<<<<<< HEAD
 import math, random, time
 from csv import writer
 
@@ -21,6 +22,71 @@ def randWeights():
     rounds_only_5s = random.randint(0,10)
     rounds_choosing_only_difficult_pieces = random.randint(0,8)
     num_of_difficult_pieces_included = random.randint(rounds_choosing_only_difficult_pieces+1,10)
+=======
+from display import Display
+
+import math, random
+import pandas as pd
+import pygame
+from csv import writer
+
+PRINT_BOARD = True
+pieces = generatePiecesDict(pieces)  
+board = Board(14)  
+# board.running = False
+
+display = Display(14, 40, board, pieces)
+
+def randWeights():
+  w1 = random.uniform(1, 60)
+  w2 = random.uniform(1, 60)
+  w3 = random.uniform(1, 60)
+  w4 = random.uniform(1, 60)
+  w5 = random.uniform(1, 60)
+  w6 = random.uniform(1, 60)
+  w7 = random.uniform(1, 60)
+  w8 = random.uniform(1, 60)
+  w9 = random.uniform(1, 60)
+  
+  rounds_only_5s = random.randint(0,10)
+  rounds_choosing_only_difficult_pieces = random.randint(0,10)
+  num_of_difficult_pieces_included = random.randint(0,10)
+  
+  return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
+
+# p1_weights = randWeights()
+p2_weights = randWeights()
+# p2_weights = [5,1,1,5,1,1,12,15,0,2,4,6]
+while board.running:
+  display.draw()
+  display.update()
+  
+  print()
+  print(board.finished, board.score)
+
+  poss_moves = len(board.calculateLegalMoves())
+  print("Turn: ", board.turn_count)
+  
+  if board.state == 'p1_turn':
+    
+    if PRINT_BOARD:
+      board.print()
+          
+    # if poss_moves > 0:
+    #   board.playSmart_v2(1, p1_weights)
+    # elif poss_moves > 100:
+    #   board.playSmart_v2(2, p1_weights)
+    # else:
+    #   board.playSmart_v2(3, p1_weights)
+
+    display.humanTurn()
+    board.switchPlayer()
+    display.draw()
+    display.update()
+    # board.humanTurn()
+    # board.playSmart(0)
+
+>>>>>>> 71a94b6 (Pygame interface)
     
     return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
 
@@ -91,6 +157,7 @@ for i in range(number_of_simulations):
           break
       
     
+<<<<<<< HEAD
     if board.finished == [True,True]:
       board.displayStateOfGame()
       print("The number of rounds played is:", board.turn_count)
@@ -123,4 +190,24 @@ for i in range(number_of_simulations):
       
       
       break
+=======
+    
+    board.playSmart(0, p2_weights)
+    # board.randomTurn()
+    # board.humanTurn()
+    
+    # if poss_moves > 400:
+    #   board.playSmart(0)
+    # elif poss_moves > 100:
+    #   board.playSmart(1)
+    # else:
+    #   board.playSmart(2)
+  display.draw()
+  display.update()
+  if board.finished == [True,True]:
+    board.displayStateOfGame()
+    print("The number of rounds played is:", board.turn_count)
+    
+    break
+>>>>>>> 71a94b6 (Pygame interface)
 
