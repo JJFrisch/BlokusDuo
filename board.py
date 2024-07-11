@@ -3,8 +3,6 @@ import copy
 import math
 
 
-# random.seed(32)
-
 PLAYERS = {
     1: 'human',
     2: 'random'   
@@ -267,10 +265,10 @@ class Board:
 
 
         
-    def randomTurn(self): #JF
+    def randomTurn(self, not_to_use, not_to_use2): #JF
         all_moves = self.calculateLegalMoves(only_fives_rounds=3)
 
-        if all_moves != []:
+        if len(all_moves) > 0:
             move = random.choice(all_moves)
             self.place_piece(move)
         else:
@@ -359,7 +357,6 @@ class Board:
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                # tempBoard.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, False, alpha, beta, weights)
                 best_val = max( best_val, value) 
                 alpha = max( alpha, best_val)
@@ -373,7 +370,6 @@ class Board:
             for my_move in move_list:
                 tempBoard = copy.deepcopy(board)
                 tempBoard.place_piece(my_move)
-                # tempBoard.switchPlayer()
                 value = board.minimax(tempBoard, depth-1, True, alpha, beta, weights)
                 best_val = min( best_val, value) 
                 beta = min( beta, best_val)
@@ -382,9 +378,9 @@ class Board:
             return best_val
         
     def smartTurn(self, level, weights): #JF
-        move_list = self.calculateLegalMoves(only_fives_rounds=4)
+        move_list = self.calculateLegalMoves(only_fives_rounds=weights[9])
         random.shuffle(move_list)
-        print("Number of moves available: ", len(move_list))
+        # print("Number of moves available: ", len(move_list))
         best_val = -10001
         best_move = []
         for my_move in move_list:
@@ -410,8 +406,8 @@ class Board:
             return board.calculateBoardScore_dots(board, weights)
         
         val = -math.inf
-        for move in board.calculateLegalMoves(6):
-            val = max(val, board.min_value(board.result(board, move), level-1, alpha, beta))
+        for move in board.calculateLegalMoves(only_fives_rounds=weights[9]):
+            val = max(val, board.min_value(board.result(board, move), level-1, alpha, beta, weights))
             alpha = max(alpha, val)
             if alpha >= beta:
                 break
@@ -427,8 +423,8 @@ class Board:
             return board.calculateBoardScore_dots(board, weights)
         
         val = math.inf
-        for move in board.calculateLegalMoves(6):
-            val = min(val, board.max_value(board.result(board, move), level-1, alpha, beta))
+        for move in board.calculateLegalMoves(only_fives_rounds=weights[9]):
+            val = min(val, board.max_value(board.result(board, move), level-1, alpha, beta, weights))
             beta = min(alpha, val) 
             if alpha >= beta:
                 break
@@ -447,7 +443,7 @@ class Board:
         return tempBoard
     
     def minimax_v2(self, board, level, isMaximizingPlayer, weights):
-        print(level, level==0)
+        # print(level, level==0)
         if level == 0:
             return 
         
@@ -457,14 +453,14 @@ class Board:
         else:
             moves = board.calculateLegalMoves(only_fives_rounds=weights[9])
         
-        print(len(moves), len(moves)**level, ": moves, possibilities")
+        # print(len(moves), len(moves)**level, ": moves, possibilities")
         i = 1
         if isMaximizingPlayer:
             val = -math.inf
             best_move = []
             for move in moves:
-                if i % 100 == 0:
-                    print(i)
+                # if i % 100 == 0:
+                #     print(i)
                 new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val > val:
                     val = new_val
@@ -475,8 +471,8 @@ class Board:
             val = math.inf
             best_move = []
             for move in moves:
-                if i % 100 == 0:
-                    print(i)
+                # if i % 100 == 0:
+                    # print(i)
                 new_val = board.max_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val < val:
                     val = new_val
@@ -489,11 +485,12 @@ class Board:
 
     def playSmart_v2(self, level, weights):
         tempBoard = copy.deepcopy(self)
+        # print(level)
         if level % 2 == 0:
             move = self.minimax_v2(tempBoard, level, True, weights)
         elif level % 2 == 1:
             move = self.minimax_v2(tempBoard, level, False, weights)
-        print(move)
+        # print(move)
 
         
         if move == []:
@@ -506,7 +503,7 @@ class Board:
     
         
     def playSmart(self, level, weights): #JF
-        best_move = self.smartTurn(level, weights)
+        best_move = self.smartTurn(level-1, weights)
         if best_move == []:
             self.finished[self.turn-1] = True
         else:
@@ -538,7 +535,7 @@ class Board:
         self.place_piece(move)
         print(self.inv[self.turn-1])
         print(self.score)
-        self.switchPlayer()
+        # self.switchPlayer()
 
 
         def squareDiff(self): 
