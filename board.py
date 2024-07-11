@@ -296,12 +296,11 @@ class Board:
         return False
 
         
-    def calculateBoardScore_dots(self, board, weights = [5,1,1,3,1,1,8,12,0,0,0,0]): #JF
+    def calculateBoardScore_dots(self, board, weights): #JF
         # w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 = weights
         score = 0
         starting_pos = [[4,4], [9,9]]
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
-        # print(w7)
 
         if board.turn_count >= 35:
             score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
