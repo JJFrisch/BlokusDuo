@@ -1,7 +1,7 @@
 import random
 import copy
 import math
-
+from orient import generatePiecesDict, pieces
 
 PLAYERS = {
     1: 'human',
@@ -10,7 +10,7 @@ PLAYERS = {
 
 piece_id = {1: "i1", 2: "i2", 3: "i3", 4: "quadruple line", 5: "quintuple line", 6: "z4", 7: "t4", 8: "l4", 9: "square", 10: "w", 11: "p", 12: "f", 13: "t5", 14: "x", 15: "z5", 16: "v5", 17: "u", 18: "v3", 19: "n", 20: "y", 21: "l5"}
 piece_possible_orientations = [[0], [0,1], [0,1], [0,1], [0,1], [0,1,4,5], [0,1,2,3], [0,1,2,3,4,5,6,7], [0], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3], [0], [0,1,4,5], [0,1,2,3], [0,1,2,3], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7]]
-
+pieces = generatePiecesDict(pieces) 
 
 class Board:
     '''
@@ -22,7 +22,7 @@ class Board:
     2 represents player 2's placed pieces
     '''
 
-    def __init__(self, s: int, pieces):
+    def __init__(self, s: int):
 
         self.running = True
         self.state = "p1_turn"
@@ -51,7 +51,7 @@ class Board:
         
         self.piece_diff_ord = [13, 4, 14, 15, 12, 16, 9, 3, 20, 11,19,5,6,2,7,17]
 
-        self.pieces = pieces
+        # pieces = pieces
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
 
     def print(self):
@@ -178,10 +178,10 @@ class Board:
                 if self.turn not in self.getEdgesValues(x,y):
                     # print('edges check out: none of them are same team')
                     for piece_num in self.inv[self.turn-1]:
-                        if (self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
+                        if (self.turn_count < only_fives_rounds and len(pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
                             for orientation_number in piece_possible_orientations[piece_num]:
                                 # print("checking this orientation now:", orientation_number)
-                                orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
+                                orientation = pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
                                 for dir in range(4):
                                     for pieceBlock in orientation[dir + 1]:
                                         center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
@@ -210,10 +210,10 @@ class Board:
                 if self.turn not in self.getEdgesValues(x,y):
                     # print('edges check out: none of them are same team')
                     for piece_num in piece_diff_ord:
-                        if (self.turn_count < only_fives_rounds and len(self.pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
+                        if (self.turn_count < only_fives_rounds and len(pieces[piece_num][0][0]) == 4) or self.turn_count >= only_fives_rounds:
                             for orientation_number in piece_possible_orientations[piece_num]:
                                 # print("checking this orientation now:", orientation_number)
-                                orientation = self.pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
+                                orientation = pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
                                 for dir in range(4):
                                     for pieceBlock in orientation[dir + 1]:
                                         center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
@@ -234,19 +234,19 @@ class Board:
         x, y, piece_num, orientation_number, poss_squares_i, dir = move
 
         #update score
-        self.score[self.turn-1] += 1 + len(self.pieces[piece_num][orientation_number][0])
+        self.score[self.turn-1] += 1 + len(pieces[piece_num][orientation_number][0])
         self.possible_squares[self.turn-1].pop(poss_squares_i)
 
         #change board by putting down the peice
         self.board[y][x] = self.turn
-        for block in self.pieces[piece_num][orientation_number][0]:
+        for block in pieces[piece_num][orientation_number][0]:
             self.board[y+block[1]][x+block[0]] = self.turn
 
         # update the possible squares
         #check the existing possible squares in case they are no longer placeable
         self.possible_squares = self.check_possible_squares()
         # add in the new avalible possible squares
-        NE,SE,SW,NW = self.pieces[piece_num][orientation_number][1:]
+        NE,SE,SW,NW = pieces[piece_num][orientation_number][1:]
         for dir in range(4):
             for corner in [NE,SE,SW,NW][dir]:
                 possible_dot_x = x + (-1*self.corner_diffs[dir][0]) + corner[0]
@@ -380,7 +380,6 @@ class Board:
     def smartTurn(self, level, weights): #JF
         move_list = self.calculateLegalMoves(only_fives_rounds=weights[9])
         random.shuffle(move_list)
-        # print("Number of moves available: ", len(move_list))
         best_val = -10001
         best_move = []
         for my_move in move_list:
@@ -503,7 +502,7 @@ class Board:
     
         
     def playSmart(self, level, weights): #JF
-        best_move = self.smartTurn(level-1, weights)
+        best_move = self.smartTurn(0, weights)
         if best_move == []:
             self.finished[self.turn-1] = True
         else:
@@ -543,7 +542,7 @@ class Board:
 
         # def is_legal_move(self, x, y, choice, orientation):
         #     valid = True
-        #     for block in self.pieces[choice][orientation][0]:
+        #     for block in pieces[choice][orientation][0]:
         #         x_prime = block[0]+x
         #         y_prime = block[1]+y
         #         # checks out of bounds, and not occupied by either player
@@ -551,7 +550,7 @@ class Board:
         #             valid = False
 
         #     # also need to check one of the corners is touching
-        #     for block in self.pieces[choice][orientation][0]:
+        #     for block in pieces[choice][orientation][0]:
         #         xx = block[0] + x
         #         yy = block[1] + y
         #         # if xx-1 >= 0 and self.board[yy][xx-1] is not self.turn or xx + 1 < self.dim and self.board[yy][xx+1] is not self.turn or yy-1 >= 0 and self.board[yy-1][xx] is not self.turn or yy + 1 < self.dim and self.board[yy+1][xx] is not self.turn:
