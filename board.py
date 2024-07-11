@@ -3,7 +3,7 @@ import copy
 import math
 
 
-random.seed(32)
+# random.seed(32)
 
 PLAYERS = {
     1: 'human',
@@ -301,17 +301,19 @@ class Board:
         score = 0
         starting_pos = [[4,4], [9,9]]
         if board.turn_count < 20:
-            w1 = 4 # stay between 1-10, prolly lower like 2-5
+            w1 = 8 # stay between 1-10, prolly lower like 2-5
+            w7 = 8
+            w8 = 8
         else:
-            w1 = 2
-        w2 = 1.5 - math.log(0.001 * board.turn_count) #the front stays very low
+            w1 = 4
+            w7 = 15
+            w8 = 20
+        w2 = 1 - math.log(0.001 * board.turn_count) #the front stays very low
         w3 = 1
         w4 = 3
-        w5 = 1.5 - math.log(0.001 * board.turn_count) #the front stays very low
+        w5 = 1 - math.log(0.001 * board.turn_count) #the front stays very low
         w6 = 1
-        w7 = 8
-        
-        w8 = 10
+
         
 
         if board.turn_count >= 25:
@@ -469,7 +471,7 @@ class Board:
         else:
             moves = board.calculateLegalMoves(6)
         
-        print(len(moves), len(moves)**level, ": thats how many moves and how many possibilities based on depth")
+        print(len(moves), len(moves)**level, ": moves, possibilities")
         i = 1
         if isMaximizingPlayer:
             val = -math.inf
