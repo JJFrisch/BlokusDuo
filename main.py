@@ -29,14 +29,14 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  player_types = [board.playSmart_v2, board.randomTurn, board.playSmart]
+  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
         board.randomTurn : 'randomTurn',
       }
 
-  player_type = random.choice(player_types)
+  player_type = random.choices(player_types, weights=(5, 35, 60), k=1)[0]
   num_levels = random.randint(0,4)
   min_moves = 1000
   player_levels = []
