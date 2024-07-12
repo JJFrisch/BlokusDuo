@@ -4,7 +4,7 @@ pieces = generatePiecesDict(pieces)
 import random
 import copy
 import math
-
+from orient import generatePiecesDict, pieces
 
 PLAYERS = {
     1: 'human',
@@ -13,7 +13,7 @@ PLAYERS = {
 
 piece_id = {1: "i1", 2: "i2", 3: "i3", 4: "quadruple line", 5: "quintuple line", 6: "z4", 7: "t4", 8: "l4", 9: "square", 10: "w", 11: "p", 12: "f", 13: "t5", 14: "x", 15: "z5", 16: "v5", 17: "u", 18: "v3", 19: "n", 20: "y", 21: "l5"}
 piece_possible_orientations = [[0], [0,1], [0,1], [0,1], [0,1], [0,1,4,5], [0,1,2,3], [0,1,2,3,4,5,6,7], [0], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3], [0], [0,1,4,5], [0,1,2,3], [0,1,2,3], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7]]
-
+pieces = generatePiecesDict(pieces) 
 
 class Board:
     '''
@@ -53,7 +53,8 @@ class Board:
         ]
         
         self.piece_diff_ord = [13, 4, 14, 15, 12, 16, 9, 3, 20, 11,19,5,6,2,7,17]
-        
+
+        # pieces = pieces..
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
 
     def print(self):
@@ -382,7 +383,6 @@ class Board:
     def smartTurn(self, level, weights): #JF
         move_list = self.calculateLegalMoves(only_fives_rounds=weights[9])
         random.shuffle(move_list)
-        # print("Number of moves available: ", len(move_list))
         best_val = -10001
         best_move = []
         for my_move in move_list:
@@ -505,7 +505,7 @@ class Board:
     
         
     def playSmart(self, level, weights): #JF
-        best_move = self.smartTurn(level-1, weights)
+        best_move = self.smartTurn(0, weights)
         if best_move == []:
             self.finished[self.turn-1] = True
         else:

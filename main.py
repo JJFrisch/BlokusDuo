@@ -1,12 +1,12 @@
 from board import Board
-from orient import generatePiecesDict, pieces
-<<<<<<< HEAD
+# from orient import generatePiecesDict, pieces
 import math, random, time
 from csv import writer
+import time
 
-number_of_simulations = 5
+number_of_simulations = 2     
 PRINT_BOARD = False
-pieces = generatePiecesDict(pieces) 
+# pieces = generatePiecesDict(pieces) 
 
 def randWeights():
     w1 = random.uniform(1, 60)
@@ -22,77 +22,13 @@ def randWeights():
     rounds_only_5s = random.randint(0,10)
     rounds_choosing_only_difficult_pieces = random.randint(0,8)
     num_of_difficult_pieces_included = random.randint(rounds_choosing_only_difficult_pieces+1,10)
-=======
-from display import Display
-
-import math, random
-import pandas as pd
-import pygame
-from csv import writer
-
-PRINT_BOARD = True
-pieces = generatePiecesDict(pieces)  
-board = Board(14)  
-# board.running = False
-
-display = Display(14, 40, board, pieces)
-
-def randWeights():
-  w1 = random.uniform(1, 60)
-  w2 = random.uniform(1, 60)
-  w3 = random.uniform(1, 60)
-  w4 = random.uniform(1, 60)
-  w5 = random.uniform(1, 60)
-  w6 = random.uniform(1, 60)
-  w7 = random.uniform(1, 60)
-  w8 = random.uniform(1, 60)
-  w9 = random.uniform(1, 60)
-  
-  rounds_only_5s = random.randint(0,10)
-  rounds_choosing_only_difficult_pieces = random.randint(0,10)
-  num_of_difficult_pieces_included = random.randint(0,10)
-  
-  return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
-
-# p1_weights = randWeights()
-p2_weights = randWeights()
-# p2_weights = [5,1,1,5,1,1,12,15,0,2,4,6]
-while board.running:
-  display.draw()
-  display.update()
-  
-  print()
-  print(board.finished, board.score)
-
-  poss_moves = len(board.calculateLegalMoves())
-  print("Turn: ", board.turn_count)
-  
-  if board.state == 'p1_turn':
-    
-    if PRINT_BOARD:
-      board.print()
-          
-    # if poss_moves > 0:
-    #   board.playSmart_v2(1, p1_weights)
-    # elif poss_moves > 100:
-    #   board.playSmart_v2(2, p1_weights)
-    # else:
-    #   board.playSmart_v2(3, p1_weights)
-
-    display.humanTurn()
-    board.switchPlayer()
-    display.draw()
-    display.update()
-    # board.humanTurn()
-    # board.playSmart(0)
-
->>>>>>> 71a94b6 (Pygame interface)
     
     return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
 
  
 for i in range(number_of_simulations):
-  board = Board(14, pieces)  
+  init_time = time.time()
+  board = Board(14)  
   player_types = [board.playSmart_v2, board.randomTurn, board.playSmart]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
@@ -133,17 +69,18 @@ for i in range(number_of_simulations):
     if poss_moves == 0:
       board.finished[board.turn-1] = True
       board.switchPlayer()
-    # print()
-    print(poss_moves, " moves on that turn")
+
+    if PRINT_BOARD:
+      print()
+      board.print()
+        
+    # print("Turn: ", board.turn_count)
+    # print(poss_moves, " moves on that turn")
     print(board.finished, board.score)
-    # if PRINT_BOARD:
-    #     board.print()
-    print("Turn: ", board.turn_count)
     
     if board.state == 'p1_turn':
 
       for level in player_levels:
-        # print(level, 'level')
         if poss_moves > level[0]:
           player_type(level[1], p1_weights)
           break
@@ -151,25 +88,34 @@ for i in range(number_of_simulations):
     elif board.state == 'p2_turn':
       
       for level in opp_levels:
-        # print(level, 'level')
         if poss_moves > level[0]:
           opp_type(level[1], p2_weights)
           break
       
     
-<<<<<<< HEAD
     if board.finished == [True,True]:
       board.displayStateOfGame()
       print("The number of rounds played is:", board.turn_count)
-      
+      finial_time = time.time()
+      d_time = finial_time - init_time
+      if convert_func_names[player_type] == 'playSmart_v1' :
+        player_levels = [0,1]
+      if convert_func_names[player_type] == 'randomTurn':
+        player_levels = 0
+      if convert_func_names[opp_type] == 'playSmart_v1' :
+        player_levels = [0,1]
+      if convert_func_names[opp_type] == 'randomTurn':
+        player_levels = 0
       # List that we want to add as a new row
       # Player Type	Player Levels ex. poss_moves = i. if i > 400: depth =1, i>100: depth=2, i>0:depth=3	Opponent Type	Opponent Levels	Player Score	Opponent Score	Score Differential	Player Pieces Left	Opponent Pieces Left	# rounds	w1 - score per opp dot	w2 - opp dot dist from player start	w3 - score per opp dot open corners #	w4 - score per player dot	w5 - player dot dist from opp start	w6 - score per player dot open corners #	w7 - player score multiplier	w8 - opponent score multiplier	w9 - piece difficulty weight	only 5's rounds	rounds choosing only difficult peices	# of difficult pieces included	
-      p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count]
+      p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count, ]
       for w in p1_weights:
         p1_list.append(w)
+      p1_list.append(d_time)
       p2_list = [convert_func_names[opp_type], opp_levels, convert_func_names[player_type], player_levels, board.score[1], board.score[0], board.score[1]-board.score[0], board.inv[1], board.inv[0], board.turn_count]
       for w in p2_weights:
         p2_list.append(w)
+      p2_list.append(d_time)
         
       # Open our existing CSV file in append mode
       # Create a file object for this file
@@ -190,24 +136,4 @@ for i in range(number_of_simulations):
       
       
       break
-=======
-    
-    board.playSmart(0, p2_weights)
-    # board.randomTurn()
-    # board.humanTurn()
-    
-    # if poss_moves > 400:
-    #   board.playSmart(0)
-    # elif poss_moves > 100:
-    #   board.playSmart(1)
-    # else:
-    #   board.playSmart(2)
-  display.draw()
-  display.update()
-  if board.finished == [True,True]:
-    board.displayStateOfGame()
-    print("The number of rounds played is:", board.turn_count)
-    
-    break
->>>>>>> 71a94b6 (Pygame interface)
 
