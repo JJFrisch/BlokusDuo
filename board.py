@@ -557,3 +557,8 @@ class Board:
         #         #     valid = False
 
         #     return valid
+        
+        
+    def monte_carlo_turn(self, level, weights):
+        pass
+        
