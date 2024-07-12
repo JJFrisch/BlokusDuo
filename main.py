@@ -4,7 +4,7 @@ import math, random, time
 from csv import writer
 import time
 
-number_of_simulations = 50
+number_of_simulations = 2     
 PRINT_BOARD = False
 # pieces = generatePiecesDict(pieces) 
 
