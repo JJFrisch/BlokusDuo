@@ -51,7 +51,7 @@ class Board:
         
         self.piece_diff_ord = [13, 4, 14, 15, 12, 16, 9, 3, 20, 11,19,5,6,2,7,17]
 
-        # pieces = pieces
+        # pieces = pieces..
         self.corner_diffs = [[-1,1], [-1,-1], [1,-1], [1,1]]
 
     def print(self):

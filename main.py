@@ -76,7 +76,7 @@ for i in range(number_of_simulations):
         
     # print("Turn: ", board.turn_count)
     # print(poss_moves, " moves on that turn")
-    # print(board.finished, board.score)
+    print(board.finished, board.score)
     
     if board.state == 'p1_turn':
 
