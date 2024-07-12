@@ -4,7 +4,7 @@ import math, random, time
 from csv import writer
 import time
 
-number_of_simulations = 2     
+number_of_simulations = 20
 PRINT_BOARD = False
 # pieces = generatePiecesDict(pieces) 
 
@@ -58,8 +58,7 @@ for i in range(number_of_simulations):
   
   p1_weights = randWeights()
   p2_weights = randWeights()
-  # player_levels = [[0,1]]
-  # opp_levels = [[0,1]]
+
 
   print("Player 1:", convert_func_names[player_type], player_levels)
   print("Player 2:", convert_func_names[opp_type], opp_levels)
@@ -103,9 +102,9 @@ for i in range(number_of_simulations):
       if convert_func_names[player_type] == 'randomTurn':
         player_levels = 0
       if convert_func_names[opp_type] == 'playSmart_v1' :
-        player_levels = [0,1]
+        opp_levels = [0,1]
       if convert_func_names[opp_type] == 'randomTurn':
-        player_levels = 0
+        opp_levels = 0
       # List that we want to add as a new row
       # Player Type	Player Levels ex. poss_moves = i. if i > 400: depth =1, i>100: depth=2, i>0:depth=3	Opponent Type	Opponent Levels	Player Score	Opponent Score	Score Differential	Player Pieces Left	Opponent Pieces Left	# rounds	w1 - score per opp dot	w2 - opp dot dist from player start	w3 - score per opp dot open corners #	w4 - score per player dot	w5 - player dot dist from opp start	w6 - score per player dot open corners #	w7 - player score multiplier	w8 - opponent score multiplier	w9 - piece difficulty weight	only 5's rounds	rounds choosing only difficult peices	# of difficult pieces included	
       p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count, ]

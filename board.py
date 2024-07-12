@@ -452,14 +452,14 @@ class Board:
         else:
             moves = board.calculateLegalMoves(only_fives_rounds=weights[9])
         
-        # print(len(moves), len(moves)**level, ": moves, possibilities")
+        print(len(moves), len(moves)**level, ": moves, possibilities")
         i = 1
         if isMaximizingPlayer:
             val = -math.inf
             best_move = []
             for move in moves:
-                # if i % 100 == 0:
-                #     print(i)
+                if i % 100 == 0:
+                    print(i)
                 new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val > val:
                     val = new_val
@@ -470,8 +470,8 @@ class Board:
             val = math.inf
             best_move = []
             for move in moves:
-                # if i % 100 == 0:
-                    # print(i)
+                if i % 100 == 0:
+                    print(i)
                 new_val = board.max_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val < val:
                     val = new_val
@@ -560,5 +560,9 @@ class Board:
         
         
     def monte_carlo_turn(self, level, weights):
+        
+        
+        
+        
         pass
         
