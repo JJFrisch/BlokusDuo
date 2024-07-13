@@ -2,8 +2,8 @@ name: Daily Commit
 
 on:
   schedule:
-    # - cron: '0 23 * * *' # Runs every day at 11 AM
-     - cron: '0 6 * * *' # Runs every day at 11 AM
+    # - cron: '0 23 * * *' # Runs every day at 11 pm
+     - cron: '0 6 * * *' # Runs every day at 6 AM
 
 jobs:
   build:

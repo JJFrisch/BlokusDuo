@@ -3,8 +3,9 @@ from board import Board
 import math, random, time
 from csv import writer
 import time
+#408
 
-number_of_simulations = 20
+number_of_simulations = 2000000
 PRINT_BOARD = False
 # pieces = generatePiecesDict(pieces) 
 
