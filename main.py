@@ -5,6 +5,13 @@ from csv import writer
 import time
 #408
 
+data = [
+    ['Player_Type','Player_Levels','Opponent_Type','Opponent_Levels','Player_Score','Opponent_Score','Score_Differential','Player_Pieces_Left','Opponent Pieces Left','# rounds','w1 - score per opp dot','w2 - opp dot dist from player start','w3 - score per opp dot open corners #','w4 - score per player dot','w5 - player dot dist from opp start','w6 - score per player dot open corners #','w7 - player score multiplier','w8 - opponent score multiplier','w9 - piece difficulty weight','only 5s rounds','rounds choosing only difficult pieces','# of difficult pieces included','time taken']
+]
+ 
+# File path for the CSV file
+csv_file_path = 'BlokusDuo-main/game_data.csv'
+
 number_of_simulations = 2000000
 PRINT_BOARD = False
 # pieces = generatePiecesDict(pieces) 
@@ -119,7 +126,7 @@ for i in range(number_of_simulations):
         
       # Open our existing CSV file in append mode
       # Create a file object for this file
-      with open('game_data.csv', 'a') as f_object:
+      with open(csv_file_path, 'a') as f_object:
       
           # Pass this file object to csv.writer()
           # and get a writer object
