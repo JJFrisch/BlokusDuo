@@ -6,6 +6,8 @@ import copy
 import math
 from orient import generatePiecesDict, pieces
 
+import numpy as np
+
 PLAYERS = {
     1: 'human',
     2: 'random'   
@@ -542,6 +544,12 @@ class Board:
 
         def squareDiff(self): 
             return self.score[0]-self.score[1]
+        
+        def asNumpyArr(self) -> np.array:
+            return np.array(self.board)
+        
+        def asFlatNumpyArr(self) -> np.array:
+            return np.array(self.board).flatten()
 
         # def is_legal_move(self, x, y, choice, orientation):
         #     valid = True
