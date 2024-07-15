@@ -1,6 +1,7 @@
 import random
 import copy
 import math
+import numpy as np
 from orient import generatePiecesDict, pieces
 
 PLAYERS = {
@@ -31,8 +32,11 @@ class Board:
         self.dim = s
         self.board = [[0 for i in range(s)] for j in range(s)]
         self.turn = 1
+        self.to_play = 1
         self.turn_count = 1
         self.finished = [False, False]
+        
+        self.train_examples = []
         
         # score is the # of tiles placed by each player
         self.score = [0,0] # player 1 and player 2
@@ -153,7 +157,7 @@ class Board:
         valid = True
         if self.inBounds(x,y):
             edges_values = self.getEdgesValues(x, y)
-            if self.turn in edges_values:
+            if self.to_play in edges_values:
                 valid = False
             # not already taken by either team
             if self.board[y][x] != 0:
@@ -238,9 +242,9 @@ class Board:
         self.possible_squares[self.turn-1].pop(poss_squares_i)
 
         #change board by putting down the peice
-        self.board[y][x] = self.turn
+        self.board[y][x] = self.to_play
         for block in pieces[piece_num][orientation_number][0]:
-            self.board[y+block[1]][x+block[0]] = self.turn
+            self.board[y+block[1]][x+block[0]] = self.to_play
 
         # update the possible squares
         #check the existing possible squares in case they are no longer placeable
@@ -282,6 +286,7 @@ class Board:
 
     def switchPlayer(self): #JF
         self.turn_count += 1
+        self.to_play *= -1
         self.turn = 3 - self.turn
         if self.state == 'p1_turn':
             self.state = 'p2_turn'
@@ -290,6 +295,15 @@ class Board:
     
     def checkWin(self, tempBoard): #JF
         if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[2-tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
+            return True
+        return False
+    
+    def is_win(self, board, player): #JF
+        if player == -1:
+            player = 1
+        if player == 1:
+            player = 0
+        if board.finished[-1] and board.score[player] > board.score[player-1]:
             return True
         return False
 
@@ -558,11 +572,228 @@ class Board:
 
         #     return valid
         
+    # def monte_carlo_turn(self, weights, num_sims=5):
+    #     root = self.monte_carlo_search(self, self.to_play, weights, num_sims)
+    #     most_visited = None
+    #     most_visits = -1
+    #     root.info()
+    #     for child in root.children.values():
+    #         if child.visit_count > most_visits:
+    #             most_visits = child.visit_count
+    #             most_visited = child
+                
+    #     print('most visited')
+    #     most_visited.info()
+                
+    #     if most_visited == None:
+    #         self.finished[self.turn-1] = True
+    #     else:
+    #         self.board = most_visited.state.board
+
+        # self.switchPlayer()
         
-    def monte_carlo_turn(self, level, weights):
+        
+    def monte_carlo_turn(self, weights, current_player, num_sims=5):
+
+        canonical_board = copy.deepcopy(self)
+        canonical_board.board = self.get_flipped_board(self, current_player)
+
+        num_moves = len(canonical_board.calculateLegalMoves())
+
+        if num_moves == 0:
+            self.finished[2-self.turn] = True
+            ret = []
+            for hist_state, hist_current_player, hist_action_probs in self.train_examples:
+                # [Board, currentPlayer, actionProbabilities, Reward]
+                ret.append((hist_state, hist_action_probs, reward * ((-1) ** (hist_current_player != current_player))))
+            print(ret)
+            return ret
+
+        root = self.monte_carlo_search(canonical_board, self.to_play, weights, num_sims)
+            
+        action_probs = [0 for _ in range(num_moves)]
+        for move, node in root.children.items():
+            action_probs.append(node.visit_count)
+
+        action_probs = action_probs / np.sum(action_probs)
+        self.train_examples.append((canonical_board, current_player, action_probs))
+
+        action = root.choose_move()
+        print(action, "this is the root's selected action") 
+            
+        self.place_piece(move)
+        
+        self.turn_count += 1
+        self.to_play *= -1
+        self.turn = 3 - self.turn
+        if self.state == 'p1_turn':
+            self.state = 'p2_turn'
+        else:
+            self.state = 'p1_turn'
+            
+
+        reward = self.get_reward_for_player(self, current_player)
+        # print(reward, 'reward at end')
+
+                
+        
+    def get_reward_for_player(self, board, player):
+        # return None if not ended, 1 if player 1 wins, -1 if player 1 lost
+
+        if self.is_win(board, player):
+            return 1
+        if self.is_win(board, -player):
+            return -1
+        if board.finished == [True, True] and board.score[player] == board.score[player-1]:
+            return 0
+        
+        return None
+
+    
+    def monte_carlo_search(self, state, to_play, weights, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+        root = Node(0, to_play)
         
         
+        poss_moves = self.calculateLegalMoves()
+        # use a model.predict to get the action probabilities #will have to mask out illegal moves as well
+        move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
+        root.expand(copy.deepcopy(self), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
+        print(num_sims, 'num sims')
+        for __ in range(num_sims):
+            node = root
+            search_path = [node]
+            
+            while node.expanded():
+                move, node = node.select_best_child()
+                search_path.append(node)
+                
+            parent = search_path[-2]
+            next_state = self.get_next_state(state, to_play, move=move)
+            value = self.move_reward(next_state, weights)
+            
+            if value != 0:
+                # if the game has not ended
+                # expand!!
+                
+                # #eventually will want to use a model to predict the next state's 
+                # probability to choose each of the next actions. Will have to make sure to 
+                # get rid of any illegal moves still predicted by the model
+                poss_moves = self.calculateLegalMoves()
+                move_probs = [1/len(poss_moves) for i in range(len(poss_moves))]
+                node.expand(copy.deepcopy(next_state), parent.to_play *-1, move_probs, poss_moves)
+
+            self.monte_back_prop(search_path, value, parent.to_play*-1)
+        
+        return root
         
         
-        pass
+    def move_reward(self, board, weights):
+        # returns if the player has won, lost, or has no moves left, may be changable to use the calc_score_dots
+        if self.checkWin(board):
+            return 100000
+        if len(board.calculateLegalMoves()) != 0:
+            score = self.calculateBoardScore_dots(board, weights)
+            return score
+
+        return 0
+        
+    def monte_back_prop(self, search_path, value, to_play):
+        for node in reversed(search_path):
+            node.visit_count += 1
+            if node.to_play == to_play:
+                node.value_sum += value 
+            else:
+                node.value_sum -= value 
+        return
+    
+    
+    def get_flipped_board(self, board, player): # i lie
+        return [[j*player for j in i] for i in board.board]
+    
+    
+    def get_next_state(self, board, player, move):           
+        tempBoard = copy.deepcopy(board)
+        tempBoard.place_piece(move)
+        
+        tempBoard.turn_count += 1
+        tempBoard.to_play *= -1
+        tempBoard.turn = 3 - tempBoard.turn
+        if tempBoard.state == 'p1_turn':
+            tempBoard.state = 'p2_turn'
+        else:
+            tempBoard.state = 'p1_turn'
+        
+        return tempBoard
+
+class Node:
+    def __init__(self, prior, to_play):
+        self.prior = prior
+        self.to_play = to_play
+        
+        self.children = {} # moves maps to the next node
+        self.visit_count = 0
+        self.value_sum = 0
+        self.state = None
+        
+    def value(self):
+        if self.visit_count == 0:
+            return 0
+        return self.value_sum / self.visit_count
+    
+    def expanded(self):
+        return 0 < len(self.children)
+    
+    def expand(self, state, to_play, move_probabilities, moves):
+        self.to_play = to_play
+        self.state = state
+        for a, prob in enumerate(move_probabilities):
+            if prob != 0:
+                self.children[tuple(moves[a])] = Node(prior=prob, to_play=self.to_play * -1)
+            
+                            
+    def select_best_child(self):
+        #get the child with the best ucb score
+        best_child = -math.inf
+        best_move =  -1
+        best_ucb = -math.inf
+        for move, child in self.children.items():
+            ucb_score = self.ucb_score(self, child)
+            if ucb_score > best_ucb:
+                best_ucb = ucb_score
+                best_child = child
+                best_move = move
+        best_move, best_child = random.choice(list(self.children.items()))
+        return best_move, best_child
+                
+        
+    def ucb_score(self, parent, child):
+        prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
+        if child.visit_count > 0:
+            value_score = -child.value()
+        else:
+            value_score = 0
+            
+        return value_score + prior_score
+    
+    
+    def choose_move(self, just_random = False):
+        if just_random:
+            return random.choice(list(self.children.keys()))
+        
+        best_move = -1
+        most_visits = -math.inf
+        num_vis = []
+        
+        for move, child in self.children.items():
+            if most_visits < child.visit_count:
+                best_move = move
+                most_visits = child.visit_count
+                
+        return best_move
+    
+    def info(self):
+        prior = "{0:.2f}".format(self.prior)
+        print("{} Prior: {} Count: {} Value: {}".format(self.state.__str__(), prior, self.visit_count, self.value()))
+        print('children ', dict(list(self.children.items())[0: 5]))
+            
         

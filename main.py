@@ -1,13 +1,10 @@
 from board import Board
-# from orient import generatePiecesDict, pieces
 import math, random, time
 from csv import writer
 import time
-#408
 
-number_of_simulations = 2000000
-PRINT_BOARD = False
-# pieces = generatePiecesDict(pieces) 
+number_of_simulations = 1 #20000000
+PRINT_BOARD = True
 
 def randWeights():
     w1 = random.uniform(1, 60)
@@ -25,16 +22,18 @@ def randWeights():
     num_of_difficult_pieces_included = random.randint(rounds_choosing_only_difficult_pieces+1,10)
     
     return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
+  
 
  
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2]
+  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2] #, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
         board.randomTurn : 'randomTurn',
+        board.monte_carlo_turn: 'monteCarlo'
       }
 
   player_type = random.choices(player_types, weights=(5, 35, 60), k=1)[0]
@@ -77,14 +76,17 @@ for i in range(number_of_simulations):
     # print("Turn: ", board.turn_count)
     # print(poss_moves, " moves on that turn")
     print(board.finished, board.score)
+    print(board.state, 'state', board.to_play, 'to play')
     
     if board.state == 'p1_turn':
 
-      for level in player_levels:
-        if poss_moves > level[0]:
-          player_type(level[1], p1_weights)
-          break
+      # for level in player_levels:
+      #   if poss_moves > level[0]:
+      #     player_type(level[1], p1_weights)
+      #     break
+      board.monte_carlo_turn(p1_weights, 1, num_sims=500)
       
+            
     elif board.state == 'p2_turn':
       
       for level in opp_levels:
@@ -119,20 +121,19 @@ for i in range(number_of_simulations):
         
       # Open our existing CSV file in append mode
       # Create a file object for this file
-      with open('game_data.csv', 'a') as f_object:
+      # with open('game_data.csv', 'a') as f_object:
       
-          # Pass this file object to csv.writer()
-          # and get a writer object
-          writer_object = writer(f_object)
+      #     # Pass this file object to csv.writer()
+      #     # and get a writer object
+      #     writer_object = writer(f_object)
       
-          # Pass the list as an argument into
-          # the writerow()
-          writer_object.writerow(p1_list)
-          writer_object.writerow(p2_list)
+      #     # Pass the list as an argument into
+      #     # the writerow()
+      #     writer_object.writerow(p1_list)
+      #     writer_object.writerow(p2_list)
       
-          # Close the file object
-          f_object.close()
-      
+      #     # Close the file object
+      #     f_object.close()
       
       
       break
