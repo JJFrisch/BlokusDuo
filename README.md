@@ -1,8 +1,9 @@
 # BlokusDuo
-### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji, Micheal Huang
+An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through gameplay optimization using Minimax algorithms.
+### By Alden Bressler, Delia Brown, Jake Frischmann, Micheal Huang, Etash Jhanji, and Sebastian Liu
 
 The names and original orientations
-![image](pieces.png)
+[here](pieces_numbered.png)
 
  
 The reference sheet for the names, point count, corners and orientations of the blocks.
