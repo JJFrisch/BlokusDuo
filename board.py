@@ -300,10 +300,10 @@ class Board:
     
     def is_win(self, board, player): #JF
         if player == -1:
-            player = 1
+            spot = 1
         if player == 1:
-            player = 0
-        if board.finished[player-1] and board.score[player] > board.score[player-1]:
+            spot = 0
+        if board.finished[spot-1] and board.score[spot] > board.score[spot-1]:
             return True
         return False
 
@@ -604,6 +604,7 @@ class Board:
             print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
             reward = self.get_reward_for_player(self, current_player)
+            print(reward)
             ret = []
             for hist_state, hist_current_player, hist_action_probs in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
@@ -639,13 +640,16 @@ class Board:
     def get_reward_for_player(self, board, player):
         # return None if not ended, 1 if player 1 wins, -1 if player 1 lost
 
-        if board.finished == [True, True] and board.score[player] > board.score[player-1]:
+        if board.is_win(board, player):
+            print("THIS IS A WINNING MOVE")
             return 1
-        if board.finished == [True, True] and board.score[player] < board.score[player-1]:
+        if board.is_win(board, -player):
+            print("THIS IS A WINNING MOVE")
             return -1
-        if board.finished == [True, True] and board.score[player] == board.score[player-1]:
-            return 0
-        return None
+        if len(board.calculateLegalMoves()) != 0:
+            return None
+
+        return 0
 
     
     def monte_carlo_search(self, state, to_play, weights, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
@@ -690,31 +694,16 @@ class Board:
     def move_reward(self, board, weights):
         # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
         
-        player = board.to_play
-        if board.finished == [True, True] and board.score[player] > board.score[player-1]:
-            print("THIS IS A WINNING MOVE")
-            return 1
-        if board.finished == [True, True] and board.score[player] < board.score[player-1]:
-            print("THIS IS A LOSING MOVE")
-            return -1
-        if board.finished == [True, True] and board.score[player] == board.score[player-1]:
-            print("ITS  A TIE")
-            return 0
-        
-        if len(board.calculateLegalMoves()) != 0:
-            score = board.calculate_board_score_mcts(board, weights)
-            return score # must be between (1, -1)
-        
-        
-        print("SHOULD NEVER HAPPEN")
-        return None
-        
         if board.is_win(board, board.to_play):
             print("THIS IS A WINNING MOVE")
+            return -1
+        if board.is_win(board, -board.to_play):
+            print("THIS IS A WINNING MOVE")
             return 1
         if len(board.calculateLegalMoves()) != 0:
             score = board.calculate_board_score_mcts(board, weights)
-            return score # must be between (1, -1)
+            
+            return -score # must be between (1, -1)
 
         return 0
         
@@ -781,10 +770,10 @@ class Board:
         worst_possible_score = 0
         worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
         worst_possible_score -= w3 * 4
-        worst_possible_score *=  30 # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        worst_possible_score *=  len(board.possible_squares[board.turn-1]) # could be # of actual dots not the guessed 'max' for the # of opp_dots
         best_possible_score += w4 + (w5- math.log(0.001 * 40)) * (20)
         best_possible_score += w6 * 4
-        best_possible_score *=  30 # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        best_possible_score *=  len(board.possible_squares[2 - board.turn]) # could be # of actual dots not the guessed 'max' for the # of opp_dots
         worst_possible_score -= 75 * w8
         best_possible_score += 75 * w7
         
@@ -793,6 +782,8 @@ class Board:
         elif score < 0:
             score = score/abs(worst_possible_score)
         # print(score, 'score make sure between 0-1')
+        if abs(score) >= 1:
+            print('ERROR SCORE TOO HIGH, is more than 1,-1')
         return score
             
 

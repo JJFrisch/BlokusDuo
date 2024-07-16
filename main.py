@@ -6,6 +6,8 @@ import time
 number_of_simulations = 1 #20000000
 PRINT_BOARD = True
 
+standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
+
 def randWeights():
     w1 = random.uniform(1, 60)
     w2 = random.uniform(1, 60)
@@ -35,7 +37,7 @@ for i in range(number_of_simulations):
         board.monte_carlo_turn: 'monteCarlo'
       }
 
-  player_type = random.choices(player_types, weights=(5000, 35, 6), k=1)[0]
+  player_type = random.choices(player_types, weights=(5, 0, 0), k=1)[0]
   num_levels = random.randint(0,4)
   min_moves = 1000
   player_levels = []
@@ -84,10 +86,7 @@ for i in range(number_of_simulations):
       #     player_type(level[1], p1_weights)
       #     break
       print(poss_moves)
-      if poss_moves > 100:
-        board.monte_carlo_turn(p1_weights, 1, num_sims=500)
-      else:
-        board.monte_carlo_turn(p1_weights, 1, num_sims=100)
+      board.monte_carlo_turn(standard_weights, 1, num_sims=500)
       
             
     elif board.state == 'p2_turn':
@@ -95,7 +94,8 @@ for i in range(number_of_simulations):
       #   if poss_moves > level[0]:
       #     opp_type(level[1], p2_weights)
       #     break
-      board.playSmart_v2(1, p2_weights)
+      # board.randomTurn()
+      board.playSmart_v2(1, standard_weights)
       
     # break
   
