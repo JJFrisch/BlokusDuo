@@ -49,8 +49,8 @@ class Board:
 
         # available pieces
         self.inv = [
-            [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20], #player 1
-            [0,1,2,3,4,5,6,7,9,11,12,13,14,15,16,17,19,20] #player 2
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19,20], #player 1
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19,20] #player 2
         ]
         
         self.piece_diff_ord = [13, 4, 14, 15, 12, 16, 9, 3, 20, 11,19,5,6,2,7,17]
@@ -602,6 +602,7 @@ class Board:
 
         if num_moves == 0:
             self.finished[2-self.turn] = True
+            reward = self.get_reward_for_player(self, current_player)
             ret = []
             for hist_state, hist_current_player, hist_action_probs in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
@@ -613,7 +614,6 @@ class Board:
             
         action_probs = [0 for _ in range(num_moves)]
         for move, node in root.children.items():
-            print(node.visit_count)
             action_probs.append(node.visit_count)
 
         action_probs = action_probs / np.sum(action_probs)
@@ -632,9 +632,6 @@ class Board:
         else:
             self.state = 'p1_turn'
             
-
-        reward = self.get_reward_for_player(self, current_player)
-        # print(reward, 'reward at end')
 
                 
         
@@ -660,7 +657,7 @@ class Board:
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
         print(num_sims, 'num sims')
         for __ in range(num_sims):
-            node = copy.deepcopy(root)
+            node = root
             search_path = [root]
             
             while node.expanded():
@@ -668,7 +665,7 @@ class Board:
                 search_path.append(node)
                 
             parent = search_path[-2]
-            next_state = state.get_next_state(state, to_play, move=move)
+            next_state = parent.state.get_next_state(parent.state, move, parent)
             value = state.move_reward(next_state, weights)
             
             if value != 0:
@@ -713,8 +710,15 @@ class Board:
         return [[j*player for j in i] for i in board.board]
     
     
-    def get_next_state(self, board, player, move):           
-        # tempBoard = copy.deepcopy(board)
+    def get_next_state(self, board1, move, node):   
+        if list(move) not in board1.calculateLegalMoves():
+            print("WOAAAAH NO")    
+            print(board1)
+            print(board1.inv)
+            print(move, node.to_play, board1.turn)
+            print(board1.possible_squares[board1.turn-1], 'possible squares')    
+            print(node.prior)
+        board = copy.deepcopy(board1)
         board.place_piece(move)
         
         board.turn_count += 1
@@ -764,8 +768,8 @@ class Board:
         if score > 0:
             score = score/best_possible_score
         elif score < 0:
-            score = score/math.abs(worst_possible_score)
-        print(score, 'score make sure between 0-1')
+            score = score/abs(worst_possible_score)
+        # print(score, 'score make sure between 0-1')
         return score
             
 
@@ -800,7 +804,8 @@ class Node:
         best_child = None 
         best_move =  -1
         best_ucb = -math.inf
-        children_shuffled = random.shuffle(list(self.children.items()))
+        children_shuffled = list(self.children.items())
+        random.shuffle(children_shuffled)
         for move, child in children_shuffled:
             ucb_score = self.ucb_score(self, child)
             if ucb_score > best_ucb:
@@ -812,7 +817,7 @@ class Node:
                 
         
     def ucb_score(self, parent, child):
-        prior_score = child.prior * math.sqrt(math.ln(parent.visit_count) / (child.visit_count + 1))
+        prior_score = child.prior * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
         if child.visit_count > 0:
             value_score = child.value() # might be negative, check later
         else:

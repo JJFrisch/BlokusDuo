@@ -87,7 +87,6 @@ for i in range(number_of_simulations):
       
             
     elif board.state == 'p2_turn':
-      
       for level in opp_levels:
         if poss_moves > level[0]:
           opp_type(level[1], p2_weights)
