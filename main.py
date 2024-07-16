@@ -24,7 +24,6 @@ def randWeights():
     return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
   
 
- 
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
@@ -94,7 +93,8 @@ for i in range(number_of_simulations):
           opp_type(level[1], p2_weights)
           break
       
-    
+    # break
+  
     if board.finished == [True,True]:
       board.displayStateOfGame()
       print("The number of rounds played is:", board.turn_count)
