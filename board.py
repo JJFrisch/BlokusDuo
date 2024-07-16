@@ -294,7 +294,7 @@ class Board:
             self.state = 'p1_turn'
     
     def checkWin(self, tempBoard): #JF
-        if tempBoard.finished[tempBoard.turn-1] and tempBoard.score[2-tempBoard.turn] > tempBoard.score[tempBoard.turn-1]:
+        if tempBoard.finished[2-tempBoard.turn-1] and tempBoard.score[2-tempBoard.turn] < tempBoard.score[tempBoard.turn-1]:
             return True
         return False
     
@@ -303,7 +303,7 @@ class Board:
             player = 1
         if player == 1:
             player = 0
-        if board.finished[-1] and board.score[player] > board.score[player-1]:
+        if board.finished[player-1] and board.score[player] > board.score[player-1]:
             return True
         return False
 
@@ -601,6 +601,7 @@ class Board:
         num_moves = len(canonical_board.calculateLegalMoves())
 
         if num_moves == 0:
+            print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
             reward = self.get_reward_for_player(self, current_player)
             ret = []
@@ -609,28 +610,28 @@ class Board:
                 ret.append((hist_state, hist_action_probs, reward * ((-1) ** (hist_current_player != current_player))))
             print(ret)
             return ret
-
-        root = self.monte_carlo_search(canonical_board, current_player, weights, num_sims)
-            
-        action_probs = [0 for _ in range(num_moves)]
-        for move, node in root.children.items():
-            action_probs.append(node.visit_count)
-
-        action_probs = action_probs / np.sum(action_probs)
-        self.train_examples.append((canonical_board, current_player, action_probs))
-
-        action = root.choose_move()
-        print(action, "this is the root's selected action") 
-            
-        self.place_piece(action)
-        
-        self.turn_count += 1
-        self.to_play *= -1
-        self.turn = 3 - self.turn
-        if self.state == 'p1_turn':
-            self.state = 'p2_turn'
         else:
-            self.state = 'p1_turn'
+            root = self.monte_carlo_search(canonical_board, current_player, weights, num_sims)
+                
+            action_probs = [0 for _ in range(num_moves)]
+            for move, node in root.children.items():
+                action_probs.append(node.visit_count)
+
+            action_probs = action_probs / np.sum(action_probs)
+            self.train_examples.append((canonical_board, current_player, action_probs))
+
+            action = root.choose_move()
+            print(action, "this is the root's selected action") 
+                
+            self.place_piece(action)
+            
+            self.turn_count += 1
+            self.to_play *= -1
+            self.turn = 3 - self.turn
+            if self.state == 'p1_turn':
+                self.state = 'p2_turn'
+            else:
+                self.state = 'p1_turn'
             
 
                 
@@ -638,13 +639,12 @@ class Board:
     def get_reward_for_player(self, board, player):
         # return None if not ended, 1 if player 1 wins, -1 if player 1 lost
 
-        if self.is_win(board, player):
+        if board.finished == [True, True] and board.score[player] > board.score[player-1]:
             return 1
-        if self.is_win(board, -player):
+        if board.finished == [True, True] and board.score[player] < board.score[player-1]:
             return -1
         if board.finished == [True, True] and board.score[player] == board.score[player-1]:
             return 0
-        
         return None
 
     
@@ -656,7 +656,9 @@ class Board:
         move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
         print(num_sims, 'num sims')
-        for __ in range(num_sims):
+        for i in range(num_sims):
+            if i % 100 == 0:
+                print(i)
             node = root
             search_path = [root]
             
@@ -686,8 +688,29 @@ class Board:
         
         
     def move_reward(self, board, weights):
-        # returns if the player has won, lost, or has no moves left, may be changable to use the calc_score_dots
-        if board.checkWin(board):
+        # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
+        
+        player = board.to_play
+        if board.finished == [True, True] and board.score[player] > board.score[player-1]:
+            print("THIS IS A WINNING MOVE")
+            return 1
+        if board.finished == [True, True] and board.score[player] < board.score[player-1]:
+            print("THIS IS A LOSING MOVE")
+            return -1
+        if board.finished == [True, True] and board.score[player] == board.score[player-1]:
+            print("ITS  A TIE")
+            return 0
+        
+        if len(board.calculateLegalMoves()) != 0:
+            score = board.calculate_board_score_mcts(board, weights)
+            return score # must be between (1, -1)
+        
+        
+        print("SHOULD NEVER HAPPEN")
+        return None
+        
+        if board.is_win(board, board.to_play):
+            print("THIS IS A WINNING MOVE")
             return 1
         if len(board.calculateLegalMoves()) != 0:
             score = board.calculate_board_score_mcts(board, weights)
@@ -739,17 +762,17 @@ class Board:
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
 
         if board.turn_count >= 35:
-            score += w7 * (board.score[self.turn-1] - board.score[2-board.turn])
+            score += w7 * (board.score[board.turn-1] - board.score[2-board.turn])
         
         else:
-            for opp_dot in board.possible_squares[2 - self.turn]:
+            for opp_dot in board.possible_squares[2 - board.turn]:
                 score -= w1 + (w2- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
                 score -= w3 * sum(opp_dot[2])
-            for my_dot in board.possible_squares[self.turn-1]:
+            for my_dot in board.possible_squares[board.turn-1]:
                 score += w4 + (w5- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
                 score += w6 * sum(my_dot[2])
 
-            score += w7 * board.score[self.turn-1]
+            score += w7 * board.score[board.turn-1]
             score -= w8 * board.score[2-board.turn]
             # add in score += w9 * (total_inv_score - current_inv_score)
             
