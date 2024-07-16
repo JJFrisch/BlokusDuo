@@ -61,7 +61,7 @@ for i in range(number_of_simulations):
   p2_weights = randWeights()
 
 
-  print("Player 1:", convert_func_names[player_type], player_levels)
+  print("Player 1:", convert_func_names[player_type], player_levels)  
   print("Player 2:", convert_func_names[opp_type], opp_levels)
 
   while board.running:
@@ -86,8 +86,11 @@ for i in range(number_of_simulations):
       #     player_type(level[1], p1_weights)
       #     break
       print(poss_moves)
-      board.monte_carlo_turn(standard_weights, 1, num_sims=500)
-      
+      if poss_moves > 100:
+        board.monte_carlo_turn(standard_weights, 1, num_sims=500)
+      else:
+        board.monte_carlo_turn(standard_weights, 1, num_sims=50)
+            
             
     elif board.state == 'p2_turn':
       # for level in opp_levels:

@@ -656,24 +656,28 @@ class Board:
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
+        num_sims = poss_moves*2
         # use a model.predict to get the action probabilities #will have to mask out illegal moves as well
         move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
         print(num_sims, 'num sims')
         for i in range(num_sims):
-            if i % 100 == 0:
-                print(i)
+            if i % 1 == 0:
+                print(i, ' the itteration of simulations') # lag occurs between here and score / value calculations
             node = root
             search_path = [root]
             
             while node.expanded():
+                print(len(node.children), 'this is how many children they have')
                 move, node = node.select_best_child()
                 search_path.append(node)
                 
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
             value = state.move_reward(next_state, weights)
-            
+            if value == 1:
+                i = num_sims
+                
             if value != 0:
                 # if the game has not ended
                 # expand!!
@@ -694,18 +698,20 @@ class Board:
     def move_reward(self, board, weights):
         # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
         
-        if board.is_win(board, board.to_play):
-            print("THIS IS A WINNING MOVE")
-            return -1
-        if board.is_win(board, -board.to_play):
-            print("THIS IS A WINNING MOVE")
-            return 1
         if len(board.calculateLegalMoves()) != 0:
-            score = board.calculate_board_score_mcts(board, weights)
-            
-            return -score # must be between (1, -1)
-
-        return 0
+            score = -board.calculate_board_score_mcts(board, weights)
+            # print(score, 'the score of the possible move')
+            return score # must be between (1, -1)
+        else:
+            if board.score[board.turn-1] > board.score[2-board.turn]:
+                print('win move', board)
+                return 1
+            elif board.score[board.turn-1] > board.score[2-board.turn]:
+                print('loss move')
+                return -1
+            else:
+                print('tie move')
+                return 0
         
     def monte_back_prop(self, search_path, value, to_play):
         # NEED TO MAKE VALUE BETWEEN 0-1
@@ -770,10 +776,10 @@ class Board:
         worst_possible_score = 0
         worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
         worst_possible_score -= w3 * 4
-        worst_possible_score *=  len(board.possible_squares[board.turn-1]) # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        worst_possible_score *=  len(board.possible_squares[board.turn-1]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
         best_possible_score += w4 + (w5- math.log(0.001 * 40)) * (20)
         best_possible_score += w6 * 4
-        best_possible_score *=  len(board.possible_squares[2 - board.turn]) # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        best_possible_score *=  len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
         worst_possible_score -= 75 * w8
         best_possible_score += 75 * w7
         
@@ -820,6 +826,7 @@ class Node:
         best_ucb = -math.inf
         children_shuffled = list(self.children.items())
         random.shuffle(children_shuffled)
+        # newlist = [i**2 for i in range(1, 100) if i%2==0]
         for move, child in children_shuffled:
             ucb_score = self.ucb_score(self, child)
             if ucb_score > best_ucb:
