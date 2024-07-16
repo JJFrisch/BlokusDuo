@@ -604,22 +604,21 @@ class Board:
             print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
             reward = self.get_reward_for_player(self, current_player)
-            print(reward)
+            print(reward, 'reward!')
             ret = []
             for hist_state, hist_current_player, hist_action_probs in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
-                ret.append((hist_state, hist_action_probs, reward * ((-1) ** (hist_current_player != current_player))))
-            print(ret)
+                ret.append( [hist_state, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
             return ret
         else:
             root = self.monte_carlo_search(canonical_board, current_player, weights, num_sims)
                 
             action_probs = [0 for _ in range(num_moves)]
-            for move, node in root.children.items():
+            for move, node in root.children:
                 action_probs.append(node.visit_count)
 
             action_probs = action_probs / np.sum(action_probs)
-            self.train_examples.append((canonical_board, current_player, action_probs))
+            self.train_examples.append([canonical_board.board, current_player, action_probs])
 
             action = root.choose_move()
             print(action, "this is the root's selected action") 
@@ -644,7 +643,7 @@ class Board:
             print("THIS IS A WINNING MOVE")
             return 1
         if board.is_win(board, -player):
-            print("THIS IS A WINNING MOVE")
+            print("THIS IS A LOSING MOVE")
             return -1
         if len(board.calculateLegalMoves()) != 0:
             return None
@@ -656,25 +655,27 @@ class Board:
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
-        num_sims = poss_moves*2
+        num_sims = len(poss_moves)*2
         # use a model.predict to get the action probabilities #will have to mask out illegal moves as well
         move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
         print(num_sims, 'num sims')
         for i in range(num_sims):
-            if i % 1 == 0:
-                print(i, ' the itteration of simulations') # lag occurs between here and score / value calculations
+            # if i % 1 == 0:
+            #     print(i, ' the itteration of simulations') # lag occurs between here and score / value calculations
             node = root
             search_path = [root]
-            
+            j = 1
             while node.expanded():
-                print(len(node.children), 'this is how many children they have')
+                j +=1
                 move, node = node.select_best_child()
                 search_path.append(node)
                 
+            # print(j, 'num loops of expanded')    
+            
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
-            value = state.move_reward(next_state, weights)
+            value = next_state.move_reward(next_state, weights)
             if value == 1:
                 i = num_sims
                 
@@ -698,20 +699,30 @@ class Board:
     def move_reward(self, board, weights):
         # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
         
+        # if board.score[board.turn-1] < board.score[2-board.turn] and board.finished[board.turn-1]:
+        #     print('win move early')
+        #     return 1
+        # elif board.score[board.turn-1] > board.score[2-board.turn] and board.finished[2-board.turn]:
+        #     print('loss move early')
+        #     return -1
+        
         if len(board.calculateLegalMoves()) != 0:
             score = -board.calculate_board_score_mcts(board, weights)
             # print(score, 'the score of the possible move')
             return score # must be between (1, -1)
         else:
+            print(board.score, board.turn, 'score and turn value')
             if board.score[board.turn-1] > board.score[2-board.turn]:
-                print('win move', board)
-                return 1
-            elif board.score[board.turn-1] > board.score[2-board.turn]:
                 print('loss move')
                 return -1
-            else:
+            elif board.score[board.turn-1] < board.score[2-board.turn] or (board.score[0] == board.score[1] and not board.finished[2-board.turn]):
+                print('win move')
+                return 1
+            elif board.score[0] == board.score[1]:
                 print('tie move')
                 return 0
+            else:
+                print('HUUUUHHH')
         
     def monte_back_prop(self, search_path, value, to_play):
         # NEED TO MAKE VALUE BETWEEN 0-1
@@ -798,7 +809,7 @@ class Node:
         self.prior = prior
         self.to_play = to_play
         
-        self.children = {} # moves maps to the next node
+        self.children = [] # moves maps to the next node
         self.visit_count = 0
         self.value_sum = 0
         self.state = None
@@ -816,18 +827,19 @@ class Node:
         self.state = state
         for a, prob in enumerate(move_probabilities):
             if prob != 0:
-                self.children[tuple(moves[a])] = Node(prior=prob, to_play=self.to_play * -1)
-            
+                self.children.append([moves[a], Node(prior=prob, to_play=self.to_play * -1)])
+        
+        random.shuffle(self.children)
                             
     def select_best_child(self):
         #get the child with the best ucb score
         best_child = None 
         best_move =  -1
         best_ucb = -math.inf
-        children_shuffled = list(self.children.items())
-        random.shuffle(children_shuffled)
+        # children_shuffled = list(self.children.items())
+        # random.shuffle(children_shuffled)
         # newlist = [i**2 for i in range(1, 100) if i%2==0]
-        for move, child in children_shuffled:
+        for move, child in self.children:
             ucb_score = self.ucb_score(self, child)
             if ucb_score > best_ucb:
                 best_ucb = ucb_score
@@ -849,12 +861,12 @@ class Node:
     
     def choose_move(self, just_random = False):
         if just_random:
-            return random.choice(list(self.children.keys()))
+            return random.choice(self.children)[0]
         
         best_move = -1
         most_visits = -math.inf
         
-        for move, child in self.children.items():
+        for move, child in self.children:
             if most_visits < child.visit_count:
                 best_move = move
                 most_visits = child.visit_count
@@ -864,6 +876,6 @@ class Node:
     def info(self):
         prior = "{0:.2f}".format(self.prior)
         print("{} Prior: {} Count: {} Value: {}".format(self.state.__str__(), prior, self.visit_count, self.value()))
-        print('children ', dict(list(self.children.items())[0: 5]))
+        print('children ', dict(list(self.children)[0: 5]))
             
         

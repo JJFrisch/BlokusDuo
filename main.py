@@ -1,10 +1,15 @@
 from board import Board
 import math, random, time
-from csv import writer
+import csv
+import numpy as np
+import pandas as pd
 import time
 
 number_of_simulations = 1 #20000000
 PRINT_BOARD = True
+
+file_name = 'Data/mcts_trial_data.csv'
+states_collected = []
 
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
 
@@ -74,8 +79,7 @@ for i in range(number_of_simulations):
       print()
       board.print()
         
-    # print("Turn: ", board.turn_count)
-    # print(poss_moves, " moves on that turn")
+    print("Turn: ", board.turn_count)
     print(board.finished, board.score)
     print(board.state, 'state', board.to_play, 'to play')
     
@@ -86,10 +90,7 @@ for i in range(number_of_simulations):
       #     player_type(level[1], p1_weights)
       #     break
       print(poss_moves)
-      if poss_moves > 100:
-        board.monte_carlo_turn(standard_weights, 1, num_sims=500)
-      else:
-        board.monte_carlo_turn(standard_weights, 1, num_sims=50)
+      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
             
             
     elif board.state == 'p2_turn':
@@ -97,7 +98,7 @@ for i in range(number_of_simulations):
       #   if poss_moves > level[0]:
       #     opp_type(level[1], p2_weights)
       #     break
-      # board.randomTurn()
+      # board.randomTurn(0,0)
       board.playSmart_v2(1, standard_weights)
       
     # break
@@ -107,28 +108,49 @@ for i in range(number_of_simulations):
       print("The number of rounds played is:", board.turn_count)
       finial_time = time.time()
       d_time = finial_time - init_time
-      if convert_func_names[player_type] == 'playSmart_v1' :
-        player_levels = [0,1]
-      if convert_func_names[player_type] == 'randomTurn':
-        player_levels = 0
-      if convert_func_names[opp_type] == 'playSmart_v1' :
-        opp_levels = [0,1]
-      if convert_func_names[opp_type] == 'randomTurn':
-        opp_levels = 0
-      # List that we want to add as a new row
-      # Player Type	Player Levels ex. poss_moves = i. if i > 400: depth =1, i>100: depth=2, i>0:depth=3	Opponent Type	Opponent Levels	Player Score	Opponent Score	Score Differential	Player Pieces Left	Opponent Pieces Left	# rounds	w1 - score per opp dot	w2 - opp dot dist from player start	w3 - score per opp dot open corners #	w4 - score per player dot	w5 - player dot dist from opp start	w6 - score per player dot open corners #	w7 - player score multiplier	w8 - opponent score multiplier	w9 - piece difficulty weight	only 5's rounds	rounds choosing only difficult peices	# of difficult pieces included	
-      p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count, ]
-      for w in p1_weights:
-        p1_list.append(w)
-      p1_list.append(d_time)
-      p2_list = [convert_func_names[opp_type], opp_levels, convert_func_names[player_type], player_levels, board.score[1], board.score[0], board.score[1]-board.score[0], board.inv[1], board.inv[0], board.turn_count]
-      for w in p2_weights:
-        p2_list.append(w)
-      p2_list.append(d_time)
+      
+      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
+      
+      # print(states_collected[0], 'first ind')
+      dim1 = len(states_collected)
+      dim2 = len(states_collected[0])
+      dim3 = len(states_collected[0][0])
+      print(dim1, dim2, dim3, 'dims of states_collected')
+      print(len(states_collected[0][1]))
+      print(len(states_collected[0][2]))
+      print(states_collected[0][2])
+      data = np.array(states_collected)
+      # for row in states_collected:
+        # data.append(np.array(states_collected))
+      df = pd.read_csv(file_name)
+      df2 = pd.DataFrame(data, columns=['Board','Move_Probs','Reward'])
+      df.append(df2, ignore_index=True)
+      df.to_csv(file_name, sep='\t', encoding='utf-8', index=True, header=True)
+      
+      
+      #######      THIS code below is used to collect data on what weights towards what works best. Random selection of type of player
+      # if convert_func_names[player_type] == 'playSmart_v1' :
+      #   player_levels = [0,1]
+      # if convert_func_names[player_type] == 'randomTurn':
+      #   player_levels = 0
+      # if convert_func_names[opp_type] == 'playSmart_v1' :
+      #   opp_levels = [0,1]
+      # if convert_func_names[opp_type] == 'randomTurn':
+      #   opp_levels = 0
+      # # List that we want to add as a new row
+      # # Player Type	Player Levels ex. poss_moves = i. if i > 400: depth =1, i>100: depth=2, i>0:depth=3	Opponent Type	Opponent Levels	Player Score	Opponent Score	Score Differential	Player Pieces Left	Opponent Pieces Left	# rounds	w1 - score per opp dot	w2 - opp dot dist from player start	w3 - score per opp dot open corners #	w4 - score per player dot	w5 - player dot dist from opp start	w6 - score per player dot open corners #	w7 - player score multiplier	w8 - opponent score multiplier	w9 - piece difficulty weight	only 5's rounds	rounds choosing only difficult peices	# of difficult pieces included	
+      # p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count, ]
+      # for w in p1_weights:
+      #   p1_list.append(w)
+      # p1_list.append(d_time)
+      # p2_list = [convert_func_names[opp_type], opp_levels, convert_func_names[player_type], player_levels, board.score[1], board.score[0], board.score[1]-board.score[0], board.inv[1], board.inv[0], board.turn_count]
+      # for w in p2_weights:
+      #   p2_list.append(w)
+      # p2_list.append(d_time)
         
-      # Open our existing CSV file in append mode
-      # Create a file object for this file
-      # with open('game_data.csv', 'a') as f_object:
+      # # Open our existing CSV file in append mode
+      # # Create a file object for this file
+      # with open(file_name, 'a') as f_object:
       
       #     # Pass this file object to csv.writer()
       #     # and get a writer object
@@ -136,6 +158,7 @@ for i in range(number_of_simulations):
       
       #     # Pass the list as an argument into
       #     # the writerow()
+            
       #     writer_object.writerow(p1_list)
       #     writer_object.writerow(p2_list)
       
