@@ -281,6 +281,7 @@ class Board:
         self.switchPlayer()
 
     def displayStateOfGame(self): #JF
+        print(self.turn, 'turn', self.to_play, 'to play')
         print(self.score, " Player 1 and Player 2 scores")
         print(self.inv, " Player 1 and Player 2 inventories")
 
@@ -603,7 +604,7 @@ class Board:
         if num_moves == 0:
             print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
-            reward = self.get_reward_for_player(self, current_player)
+            reward = self.get_reward_for_player(self, self.to_play)
             print(reward, 'reward!')
             ret = []
             for hist_state, hist_current_player, hist_action_probs, hist_moves in self.train_examples:
@@ -703,26 +704,23 @@ class Board:
         
     def move_reward(self, board, weights):
         # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
-        
-        # if board.score[board.turn-1] < board.score[2-board.turn] and board.finished[board.turn-1]:
-        #     print('win move early')
-        #     return 1
-        # elif board.score[board.turn-1] > board.score[2-board.turn] and board.finished[2-board.turn]:
-        #     print('loss move early')
-        #     return -1
-        
+
+        if self.to_play == 1:
+            player = board.turn
+        else:
+            player = 3 - board.turn
         if len(board.calculateLegalMoves()) != 0:
             score = -board.calculate_board_score_mcts(board, weights)
             # print(score, 'the score of the possible move')
             return score # must be between (1, -1)
         else:
-            print(board.score, board.turn, 'score and turn')
-            if board.score[board.turn-1] > board.score[2-board.turn]:
-                print('loss move')
-                return -1
-            elif board.score[board.turn-1] < board.score[2-board.turn]:
-                print('win move', 1+(board.score[2-board.turn] - board.score[board.turn-1]))
-                return 1 + (board.score[2-board.turn] - board.score[board.turn-1])
+            if board.score[player-1] > board.score[2-player]:
+                # print('loss move')
+                return -10 * self.to_play
+            elif board.score[player-1] < board.score[2-player]:
+                print(board.score, player, 'score and turn')
+                print('win move', 1+(board.score[2-player] - board.score[player-1]))
+                return (1 + abs(board.score[2-player] - board.score[player-1])) * self.to_play
             elif board.score[0] == board.score[1]:
                 print('tie move')
                 return 0
@@ -792,10 +790,10 @@ class Board:
         worst_possible_score = 0
         worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
         worst_possible_score -= w3 * 4
-        worst_possible_score *=  len(board.possible_squares[board.turn-1]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        worst_possible_score *=  30#len(board.possible_squares[board.turn-1]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
         best_possible_score += w4 + (w5- math.log(0.001 * 40)) * (20)
         best_possible_score += w6 * 4
-        best_possible_score *=  len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
+        best_possible_score *=  30#len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
         worst_possible_score -= 75 * w8
         best_possible_score += 75 * w7
         
@@ -864,7 +862,7 @@ class Node:
         return value_score + prior_score
     
     
-    def choose_move(self, just_random = False):
+    def choose_move(self, just_random = True):
         if just_random:
             return random.choice(self.children)[0]
         
