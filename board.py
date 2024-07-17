@@ -593,9 +593,12 @@ class Board:
 
         # self.switchPlayer()
         
+    def rand_monte_carlo_turn(self, weights, current_player, num_sims=50, rand_select=True):
+        return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select)
         
-    def monte_carlo_turn(self, weights, current_player, num_sims=5):
-
+        
+    def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False):
+        current_player = 1
         canonical_board = copy.deepcopy(self)
         canonical_board.board = self.get_flipped_board(self, current_player)
 
@@ -604,7 +607,7 @@ class Board:
         if num_moves == 0:
             print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
-            reward = self.get_reward_for_player(self, self.to_play)
+            reward = self.get_reward_for_player(self, player)
             print(reward, 'reward!')
             ret = []
             for hist_state, hist_current_player, hist_action_probs, hist_moves in self.train_examples:
@@ -612,7 +615,7 @@ class Board:
                 ret.append( [hist_state, hist_moves, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
             return ret
         else:
-            root = self.monte_carlo_search(canonical_board, current_player, weights, num_sims)
+            root = self.monte_carlo_search(canonical_board, current_player, weights, player, num_sims)
                 
             action_probs = []
             moves = []
@@ -626,7 +629,7 @@ class Board:
             action_probs = action_probs / np.sum(action_probs)
             self.train_examples.append([canonical_board.board, current_player, action_probs, moves])
 
-            action = root.choose_move()
+            action = root.choose_move(rand_select=rand_select)
             print(action, "this is the root's selected action") 
                 
             self.place_piece(action)
@@ -644,20 +647,18 @@ class Board:
         
     def get_reward_for_player(self, board, player):
         # return None if not ended, 1 if player 1 wins, -1 if player 1 lost
-
-        if board.is_win(board, player):
-            print("THIS IS A WINNING MOVE")
-            return 1
-        if board.is_win(board, -player):
-            print("THIS IS A LOSING MOVE")
+        print(player, 'end of player')
+        if board.score[player-1] < board.score[2-player]:
+            print('THIS IS A LOSING MOVE')
             return -1
-        if len(board.calculateLegalMoves()) != 0:
-            return None
-
-        return 0
+        elif board.score[player-1] > board.score[2-player]:
+            print('THIS IS A WINNING MOVE')
+            return 1
+        else:
+            return 0
 
     
-    def monte_carlo_search(self, state, to_play, weights, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+    def monte_carlo_search(self, state, to_play, weights, player, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
@@ -681,7 +682,7 @@ class Board:
             
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
-            value = next_state.move_reward(next_state, weights)
+            value = next_state.move_reward(next_state, weights, player)
             if value == 1:
                 i = num_sims
                 
@@ -702,30 +703,46 @@ class Board:
         return root
         
         
-    def move_reward(self, board, weights):
-        # returns if the player has won, lost, or has no moves left, may be changed to use the calc_score_dots
-
-        if self.to_play == 1:
-            player = board.turn
-        else:
-            player = 3 - board.turn
-        if len(board.calculateLegalMoves()) != 0:
-            score = -board.calculate_board_score_mcts(board, weights)
-            # print(score, 'the score of the possible move')
-            return score # must be between (1, -1)
-        else:
-            if board.score[player-1] > board.score[2-player]:
-                # print('loss move')
-                return -10 * self.to_play
-            elif board.score[player-1] < board.score[2-player]:
-                print(board.score, player, 'score and turn')
-                print('win move', 1+(board.score[2-player] - board.score[player-1]))
-                return (1 + abs(board.score[2-player] - board.score[player-1])) * self.to_play
-            elif board.score[0] == board.score[1]:
-                print('tie move')
-                return 0
+    def move_reward(self, board, weights, player_num):
+        # this function is extremely messy and improper,  pls ignore but is there is a better way lmk. There def is a better way
+        if player_num == 1:
+            player = 1
+            if len(board.calculateLegalMoves()) != 0:
+                score = -board.calculate_board_score_mcts(board, weights)
+                # print(score, 'the score of the possible move')
+                return score # must be between (1, -1)    
             else:
-                print('HUUUUHHH')
+                print(board.score, player, 'score and turn 1 -- ', board.to_play, 'to play')
+                if board.score[player-1] < board.score[2-player]:
+                    print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
+                    return -1 - abs(board.score[2-player] - board.score[player-1])
+                elif board.score[player-1] > board.score[2-player]:
+                    print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
+                    return 1 + abs(board.score[2-player] - board.score[player-1])
+                elif board.score[0] == board.score[1]:
+                    print('tie move')
+                    return 0
+                else:
+                    print('HUUUUHHH')
+        if player_num == 2:
+            player = 2
+            if len(board.calculateLegalMoves()) != 0:
+                score = -board.calculate_board_score_mcts(board, weights)
+                # print(score, 'the score of the possible move')
+                return score # must be between (1, -1)
+            else:
+                print(board.score, player, 'score and turn 2')
+                if board.score[player-1] < board.score[2-player]:
+                    print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
+                    return (-1 - abs(board.score[2-player] - board.score[player-1]))
+                elif board.score[player-1] > board.score[2-player]:
+                    print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
+                    return (1 + abs(board.score[2-player] - board.score[player-1]))
+                elif board.score[0] == board.score[1]:
+                    print('tie move')
+                    return 0
+                else:
+                    print('HUUUUHHH')
         
     def monte_back_prop(self, search_path, value, to_play):
         # NEED TO MAKE VALUE BETWEEN 0-1
@@ -862,8 +879,8 @@ class Node:
         return value_score + prior_score
     
     
-    def choose_move(self, just_random = True):
-        if just_random:
+    def choose_move(self, rand_select=False):
+        if rand_select:
             return random.choice(self.children)[0]
         
         best_move = -1
