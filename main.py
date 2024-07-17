@@ -81,16 +81,15 @@ for i in range(number_of_simulations):
         
     print("Turn: ", board.turn_count)
     print(board.finished, board.score)
-    print(board.state, 'state', board.to_play, 'to play')
-    
+    print(board.state, 'state', board.to_play, 'to play', poss_moves, "moves")
+    states_collected = [[], []]
     if board.state == 'p1_turn':
 
       # for level in player_levels:
       #   if poss_moves > level[0]:
       #     player_type(level[1], p1_weights)
       #     break
-      print(poss_moves)
-      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=1500)
+      states_collected[board.to_play] = board.monte_carlo_turn(standard_weights, board.to_play, num_sims=1500)
             
             
     elif board.state == 'p2_turn':
@@ -99,7 +98,8 @@ for i in range(number_of_simulations):
       #     opp_type(level[1], p2_weights)
       #     break
       # board.randomTurn(0,0)
-      board.playSmart_v2(1, standard_weights)
+      # board.playSmart_v2(1, standard_weights)
+      states_collected[board.to_play] = board.monte_carlo_turn(standard_weights, board.to_play, num_sims=1500)
       
     # break
   
@@ -109,26 +109,27 @@ for i in range(number_of_simulations):
       finial_time = time.time()
       d_time = finial_time - init_time
       
-      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
+      states_collected[board.to_play] = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
       
       earlier_df = pd.read_pickle(file_name)
       data_dict = {
-        'Boards':[],
+        'Board':[],
         'Moves':[],
         'Move_Probs':[], 
-        'Rewards': []
+        'Reward': []
       }
-      for row in states_collected:
-        data_dict['Board'].append(row[0])
-        data_dict['Move'].append(row[1])
-        data_dict['Move_Probs'].append(row[2])
-        data_dict['Reward'].append(row[3])
+      for player in states_collected:
+        for row in player:
+          data_dict['Board'].append(row[0])
+          data_dict['Moves'].append(row[1])
+          data_dict['Move_Probs'].append(row[2])
+          data_dict['Reward'].append(row[3])
         
       df = pd.DataFrame(data_dict)
-      pd.to_pickle(df, file_name)
+      # pd.to_pickle(df, file_name)
 
-      # df_merged = pd.concat([earlier_df, df])
-      # pd.to_pickle(df_merged, file_name)
+      df_merged = pd.concat([earlier_df, df])
+      pd.to_pickle(df_merged, file_name)
             
       
       #######      THIS code below is used to collect data on what weights towards what works best. Random selection of type of player
