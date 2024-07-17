@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 
-number_of_simulations = 300000
+number_of_simulations = 1
 PRINT_BOARD = True
 
 file_name = 'Data/mcts_rand_trial_data.pkl'
