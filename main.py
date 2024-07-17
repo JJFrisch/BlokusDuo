@@ -41,7 +41,7 @@ for i in range(number_of_simulations):
         board.playSmart : 'playSmart_v1',
         board.randomTurn : 'randomTurn',
         board.monte_carlo_turn: 'monteCarlo',
-        board.rand_monte_carlo_turn: 'random_monteCarlo'
+        board.rand_monte_carlo_turn: 'random_monteCarlo'      
       }
 
   player_type = random.choices(player_types, weights=(25, 5, 10, 60), k=1)[0]
@@ -59,8 +59,8 @@ for i in range(number_of_simulations):
   else:
     print("Player 1:", convert_func_names[player_type], num_sims) 
 
-  if player_type == board.monte_carlo_turn:
-    opp_type = random.choices(player_types, weights=(30, 10, 20, 40), k=1)[0]
+  if 0==0:  #  player_type == board.monte_carlo_turn:
+    opp_type = random.choices(player_types, weights=(30, 30, 30, 1), k=1)[0]
   else:
     opp_type = board.monte_carlo_turn
     
