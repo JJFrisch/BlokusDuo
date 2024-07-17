@@ -41,7 +41,7 @@ class Board:
         # score is the # of tiles placed by each player
         self.score = [0,0] # player 1 and player 2
 
-        # possible squares and corner availability (x,y,NE,SE,SW,NW)
+        # possible squares and corner avalibility (x,y,NE,SE,SW,NW)
         self.possible_squares = [
             [[4, 4, [True, True, True, True]]], #player 1 possible squares
             [[s-5, s-5, [True, True, True, True]]] #player 2 possible squares

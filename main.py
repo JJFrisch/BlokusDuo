@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 
-number_of_simulations = 3
+number_of_simulations = 300000
 PRINT_BOARD = True
 
 file_name = 'Data/mcts_rand_trial_data.pkl'
@@ -34,17 +34,17 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  num_sims = random.randint(50,1000)  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  num_sims = [random.randint(50,1000), random.randint(50,1000)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
         board.randomTurn : 'randomTurn',
         board.monte_carlo_turn: 'monteCarlo',
-        board.rand_monte_carlo_turn: 'random_monteCarlo'      
+        board.rand_monte_carlo_turn: 'random_monteCarlo'
       }
 
-  player_type = random.choices(player_types, weights=(25, 5, 10, 60), k=1)[0]
+  player_type = random.choices(player_types, weights=(10, 5, 10, 75), k=1)[0]
   
   if player_type == board.playSmart or player_type == board.playSmart_v2:
     num_levels = random.randint(0,2)
@@ -57,10 +57,10 @@ for i in range(number_of_simulations):
     player_levels.append([0,num_levels+1])
     print("Player 1:", convert_func_names[player_type], player_levels)  
   else:
-    print("Player 1:", convert_func_names[player_type], num_sims) 
+    print("Player 1:", convert_func_names[player_type], num_sims[0]) 
 
-  if 0==0:  #  player_type == board.monte_carlo_turn:
-    opp_type = random.choices(player_types, weights=(30, 30, 30, 1), k=1)[0]
+  if player_type == board.monte_carlo_turn:
+    opp_type = random.choices(player_types, weights=(30, 10, 20, 40), k=1)[0]
   else:
     opp_type = board.monte_carlo_turn
     
@@ -75,7 +75,7 @@ for i in range(number_of_simulations):
     opp_levels.append([0,num_levels+1])
     print("Player 2:", convert_func_names[opp_type], opp_levels)
   else:
-    print("Player 2:", convert_func_names[opp_type], num_sims) 
+    print("Player 2:", convert_func_names[opp_type], num_sims[1]) 
   
   p1_weights = randWeights()
   p2_weights = randWeights()
@@ -100,7 +100,7 @@ for i in range(number_of_simulations):
     if board.state == 'p1_turn':
 
       if player_type == board.rand_monte_carlo_turn or player_type == board.monte_carlo_turn:
-        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims)
+        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0])
       else:
         for level in player_levels:
           if poss_moves > level[0]:
@@ -110,7 +110,7 @@ for i in range(number_of_simulations):
             
     elif board.state == 'p2_turn':
       if opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn:
-        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims)
+        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1])
       else:
         for level in opp_levels:
           if poss_moves > level[0]:
@@ -124,9 +124,9 @@ for i in range(number_of_simulations):
       d_time = finial_time - init_time
 
       if states_collected[0] == [] and (player_type == board.rand_monte_carlo_turn or player_type == board.monte_carlo_turn):
-        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims)
+        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0])
       if states_collected[1] == [] and (opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn):
-        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims)
+        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1])
 
       earlier_df = pd.read_pickle(file_name)
       data_dict = {
@@ -135,9 +135,11 @@ for i in range(number_of_simulations):
         'Move_Probs':[], 
         'Reward': [],
         'Weights': [],
-        'Num_Sims': []
+        'Num_Sims': [],
+        'mc_type': []
       }
       weights = [p1_weights, p2_weights]
+      mc_type = [player_type, opp_type]
       
       for n in range(len(states_collected)):
           if states_collected[n] == []:
@@ -150,7 +152,8 @@ for i in range(number_of_simulations):
             data_dict['Move_Probs'].append(row[2])
             data_dict['Reward'].append(row[3])
             data_dict['Weights'].append(weights[n])
-            data_dict['Num_Sims'].append(num_sims)
+            data_dict['Num_Sims'].append(num_sims[n])
+            data_dict['mc_type'].append(mc_type[n])
         
       df = pd.DataFrame(data_dict)
       # pd.to_pickle(df, file_name)
