@@ -142,7 +142,7 @@ for i in range(number_of_simulations):
       mc_type = [player_type, opp_type]
       
       for n in range(len(states_collected)):
-          if states_collected[n] == []:
+          if states_collected[n] == None:
             print('bruh')
           for row in states_collected[n]:
             if row == []:
