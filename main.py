@@ -44,7 +44,15 @@ for i in range(number_of_simulations):
         board.rand_monte_carlo_turn: 'random_monteCarlo'
       }
 
-  player_type = random.choices(player_types, weights=(10, 5, 10, 75), k=1)[0]
+  player_type = random.choices(player_types, weights=(20, 5, 10, 50), k=1)[0]
+  if player_type == board.monte_carlo_turn:
+    opp_type = random.choices(player_types, weights=(20, 5, 10, 50), k=1)[0]
+  else:
+    opp_type = board.monte_carlo_turn
+    
+  types = [player_type, opp_type]
+  random.shuffle(types)
+  player_type, opp_type = types
   
   if player_type == board.playSmart or player_type == board.playSmart_v2:
     num_levels = random.randint(0,2)
@@ -58,11 +66,6 @@ for i in range(number_of_simulations):
     print("Player 1:", convert_func_names[player_type], player_levels)  
   else:
     print("Player 1:", convert_func_names[player_type], num_sims[0]) 
-
-  if player_type == board.monte_carlo_turn:
-    opp_type = random.choices(player_types, weights=(30, 10, 20, 40), k=1)[0]
-  else:
-    opp_type = board.monte_carlo_turn
     
   if opp_type == board.playSmart or opp_type == board.playSmart_v2:  
     num_levels = random.randint(0,2)
