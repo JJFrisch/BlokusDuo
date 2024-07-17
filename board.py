@@ -622,9 +622,6 @@ class Board:
             for move, node in root.children:
                 action_probs.append(node.visit_count)
                 moves.append(move)
-
-            if len(moves) != len(action_probs):
-                action_probs = '33' + [0,2,3] * Board
                 
             action_probs = action_probs / np.sum(action_probs)
             self.train_examples.append([canonical_board.board, current_player, action_probs, moves])
@@ -712,15 +709,15 @@ class Board:
                 # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)    
             else:
-                print(board.score, player, 'score and turn 1 -- ', board.to_play, 'to play')
+                # print(board.score, player, 'score and turn 1 -- ', board.to_play, 'to play')
                 if board.score[player-1] < board.score[2-player]:
-                    print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
+                    # print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
                     return -1 - abs(board.score[2-player] - board.score[player-1])
                 elif board.score[player-1] > board.score[2-player]:
-                    print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
+                    # print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
                     return 1 + abs(board.score[2-player] - board.score[player-1])
                 elif board.score[0] == board.score[1]:
-                    print('tie move')
+                    # print('tie move')
                     return 0
                 else:
                     print('HUUUUHHH')
@@ -731,15 +728,15 @@ class Board:
                 # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)
             else:
-                print(board.score, player, 'score and turn 2')
+                # print(board.score, player, 'score and turn 2')
                 if board.score[player-1] < board.score[2-player]:
-                    print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
+                    # print('loss move', (-1 - abs(board.score[2-player] - board.score[player-1])))
                     return (-1 - abs(board.score[2-player] - board.score[player-1]))
                 elif board.score[player-1] > board.score[2-player]:
-                    print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
+                    # print('win move', (1 + abs(board.score[2-player] - board.score[player-1])))
                     return (1 + abs(board.score[2-player] - board.score[player-1]))
                 elif board.score[0] == board.score[1]:
-                    print('tie move')
+                    # print('tie move')
                     return 0
                 else:
                     print('HUUUUHHH')
@@ -760,13 +757,6 @@ class Board:
     
     
     def get_next_state(self, board1, move, node):   
-        if list(move) not in board1.calculateLegalMoves():
-            print("WOAAAAH NO")    
-            print(board1)
-            print(board1.inv)
-            print(move, node.to_play, board1.turn)
-            print(board1.possible_squares[board1.turn-1], 'possible squares')    
-            print(node.prior)
         board = copy.deepcopy(board1)
         board.place_piece(move)
         
