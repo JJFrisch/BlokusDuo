@@ -606,19 +606,24 @@ class Board:
             reward = self.get_reward_for_player(self, current_player)
             print(reward, 'reward!')
             ret = []
-            for hist_state, hist_current_player, hist_action_probs in self.train_examples:
+            for hist_state, hist_current_player, hist_action_probs, hist_moves in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
-                ret.append( [hist_state, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
+                ret.append( [hist_state, hist_moves, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
             return ret
         else:
             root = self.monte_carlo_search(canonical_board, current_player, weights, num_sims)
                 
-            action_probs = [0 for _ in range(num_moves)]
+            action_probs = []
+            moves = []
             for move, node in root.children:
                 action_probs.append(node.visit_count)
+                moves.append(move)
 
+            if len(moves) != len(action_probs):
+                action_probs = '33' + [0,2,3] * Board
+                
             action_probs = action_probs / np.sum(action_probs)
-            self.train_examples.append([canonical_board.board, current_player, action_probs])
+            self.train_examples.append([canonical_board.board, current_player, action_probs, moves])
 
             action = root.choose_move()
             print(action, "this is the root's selected action") 
@@ -655,7 +660,7 @@ class Board:
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
-        num_sims = len(poss_moves)*2
+        # num_sims = len(poss_moves)*2
         # use a model.predict to get the action probabilities #will have to mask out illegal moves as well
         move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
@@ -711,13 +716,13 @@ class Board:
             # print(score, 'the score of the possible move')
             return score # must be between (1, -1)
         else:
-            print(board.score, board.turn, 'score and turn value')
+            print(board.score, board.turn, 'score and turn')
             if board.score[board.turn-1] > board.score[2-board.turn]:
                 print('loss move')
                 return -1
-            elif board.score[board.turn-1] < board.score[2-board.turn] or (board.score[0] == board.score[1] and not board.finished[2-board.turn]):
-                print('win move')
-                return 1
+            elif board.score[board.turn-1] < board.score[2-board.turn]:
+                print('win move', 1+(board.score[2-board.turn] - board.score[board.turn-1]))
+                return 1 + (board.score[2-board.turn] - board.score[board.turn-1])
             elif board.score[0] == board.score[1]:
                 print('tie move')
                 return 0

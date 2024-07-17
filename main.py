@@ -8,7 +8,7 @@ import time
 number_of_simulations = 1 #20000000
 PRINT_BOARD = True
 
-file_name = 'Data/mcts_trial_data.csv'
+file_name = 'Data/mcts_trial_data.pkl'
 states_collected = []
 
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
@@ -90,7 +90,7 @@ for i in range(number_of_simulations):
       #     player_type(level[1], p1_weights)
       #     break
       print(poss_moves)
-      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
+      states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=1500)
             
             
     elif board.state == 'p2_turn':
@@ -111,22 +111,25 @@ for i in range(number_of_simulations):
       
       states_collected = board.monte_carlo_turn(standard_weights, 1, num_sims=50)
       
-      # print(states_collected[0], 'first ind')
-      dim1 = len(states_collected)
-      dim2 = len(states_collected[0])
-      dim3 = len(states_collected[0][0])
-      print(dim1, dim2, dim3, 'dims of states_collected')
-      print(len(states_collected[0][1]))
-      print(len(states_collected[0][2]))
-      print(states_collected[0][2])
-      data = np.array(states_collected)
-      # for row in states_collected:
-        # data.append(np.array(states_collected))
-      df = pd.read_csv(file_name)
-      df2 = pd.DataFrame(data, columns=['Board','Move_Probs','Reward'])
-      df.append(df2, ignore_index=True)
-      df.to_csv(file_name, sep='\t', encoding='utf-8', index=True, header=True)
-      
+      earlier_df = pd.read_pickle(file_name)
+      data_dict = {
+        'Boards':[],
+        'Moves':[],
+        'Move_Probs':[], 
+        'Rewards': []
+      }
+      for row in states_collected:
+        data_dict['Board'].append(row[0])
+        data_dict['Move'].append(row[1])
+        data_dict['Move_Probs'].append(row[2])
+        data_dict['Reward'].append(row[3])
+        
+      df = pd.DataFrame(data_dict)
+      pd.to_pickle(df, file_name)
+
+      # df_merged = pd.concat([earlier_df, df])
+      # pd.to_pickle(df_merged, file_name)
+            
       
       #######      THIS code below is used to collect data on what weights towards what works best. Random selection of type of player
       # if convert_func_names[player_type] == 'playSmart_v1' :
