@@ -6,7 +6,7 @@ import pandas as pd
 import time
 
 number_of_simulations = 3
-PRINT_BOARD = True
+PRINT_BOARD = True 
 
 file_name = 'Data/playing_data.pkl'
 states_collected = []
