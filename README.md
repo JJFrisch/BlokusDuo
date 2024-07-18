@@ -16,3 +16,16 @@ https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUD
 
 ### Blokus Statistical Data spreadsheet
 https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
+
+
+### To commit large data files:
+ - git lfs
+ - cd # type the location(folder) of the file here
+ One of these, to follow a sinlge file, or a type of files
+ - git lfs track "file name"
+ - git lfs track "*.mp4"
+
+ - git add .gitattributes
+ - git add . (for all files), git add fileName.mp4 (for a single file)
+ - git commit -m "add large files"
+ - git push
