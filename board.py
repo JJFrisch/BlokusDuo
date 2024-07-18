@@ -504,7 +504,11 @@ class Board:
             
         self.switchPlayer()
         
-    
+    def asNumpyArr(self) -> np.array:
+            return np.array(self.board)
+        
+    def asFlatNumpyArr(self) -> np.array:
+        return np.array(self.board).flatten()
         
     def playSmart(self, level, weights): #JF
         best_move = self.smartTurn(0, weights)
@@ -545,11 +549,7 @@ class Board:
         def squareDiff(self): 
             return self.score[0]-self.score[1]
         
-        def asNumpyArr(self) -> np.array:
-            return np.array(self.board)
         
-        def asFlatNumpyArr(self) -> np.array:
-            return np.array(self.board).flatten()
 
         # def is_legal_move(self, x, y, choice, orientation):
         #     valid = True
