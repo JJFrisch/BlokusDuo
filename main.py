@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import time
 
-number_of_simulations = 1
+number_of_simulations = 3
 PRINT_BOARD = True
 
-file_name = 'Data/mcts_rand_trial_data.pkl'
+file_name = 'Data/playing_data.pkl'
 states_collected = []
 
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
@@ -34,8 +34,8 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  num_sims = [random.randint(50,1000), random.randint(50,1000)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
-  player_types = [board.rand_monte_carlo_turn, board.playSmart, board.playSmart_v2, board.monte_carlo_turn]
+  num_sims = [random.randint(50,1500), random.randint(50,1500)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
@@ -44,9 +44,9 @@ for i in range(number_of_simulations):
         board.rand_monte_carlo_turn: 'random_monteCarlo'
       }
 
-  player_type = random.choices(player_types, weights=(20, 5, 10, 50), k=1)[0]
+  player_type = random.choices(player_types, weights=(25, 10, 50), k=1)[0]
   if player_type == board.monte_carlo_turn:
-    opp_type = random.choices(player_types, weights=(20, 5, 10, 50), k=1)[0]
+    opp_type = random.choices(player_types, weights=(25, 10, 50), k=1)[0]
   else:
     opp_type = board.monte_carlo_turn
     
@@ -131,7 +131,14 @@ for i in range(number_of_simulations):
       if states_collected[1] == [] and (opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn):
         states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1])
 
-      earlier_df = pd.read_pickle(file_name)
+      # opened = False
+      # while not opened:
+      #   try:
+      #     earlier_df = pd.read_pickle(file_name)
+      #     opened = True
+      #   except:
+      #     pass
+          
       data_dict = {
         'Board':[],
         'Moves':[],
@@ -139,10 +146,12 @@ for i in range(number_of_simulations):
         'Reward': [],
         'Weights': [],
         'Num_Sims': [],
-        'mc_type': []
+        'mc_type': [],
+        'inv_left': []
       }
       weights = [p1_weights, p2_weights]
-      mc_type = [player_type, opp_type]
+      mc_type = [convert_func_names[player_type], convert_func_names[opp_type]]
+      inv_left = [board.inv[0], board.inv[1]]
       
       for n in range(len(states_collected)):
           if states_collected[n] == None:
@@ -157,12 +166,13 @@ for i in range(number_of_simulations):
             data_dict['Weights'].append(weights[n])
             data_dict['Num_Sims'].append(num_sims[n])
             data_dict['mc_type'].append(mc_type[n])
+            data_dict['inv_left'].append(inv_left[n])
         
       df = pd.DataFrame(data_dict)
-      # pd.to_pickle(df, file_name)
+      pd.to_pickle(df, file_name)
 
-      df_merged = pd.concat([earlier_df, df])
-      pd.to_pickle(df_merged, file_name)
+      # df_merged = pd.concat([earlier_df, df])
+      # pd.to_pickle(df_merged, file_name)
             
       break
 
