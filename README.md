@@ -7,6 +7,8 @@ The names and original orientations
  
 The reference sheet for the names, point count, corners and orientations of the blocks.
 https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUDPpI/edit?gid=0#gid=0
+#### A deep explination of Alpha Zero
+https://nikcheerla.github.io/deeplearningschool/2018/01/01/AlphaZero-Explained/
 
 #### For us to commit back to GitHub:
 * open a terminal from the folder BlokusDuo,
