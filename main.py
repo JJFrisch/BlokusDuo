@@ -4,8 +4,10 @@ import csv
 import numpy as np
 import pandas as pd
 import time
+from datetime import datetime
+import pytz
 
-number_of_simulations = 3
+number_of_simulations = 2
 PRINT_BOARD = True 
 
 file_name = 'Data/playing_data.pkl'
@@ -34,7 +36,7 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  num_sims = [random.randint(50,1500), random.randint(50,1500)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
@@ -131,13 +133,6 @@ for i in range(number_of_simulations):
       if states_collected[1] == [] and (opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn):
         states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1])
 
-      # opened = False
-      # while not opened:
-      #   try:
-      #     earlier_df = pd.read_pickle(file_name)
-      #     opened = True
-      #   except:
-      #     pass
           
       data_dict = {
         'Board':[],
@@ -167,12 +162,34 @@ for i in range(number_of_simulations):
             data_dict['Num_Sims'].append(num_sims[n])
             data_dict['mc_type'].append(mc_type[n])
             data_dict['inv_left'].append(inv_left[n])
+      
+      # df = pd.DataFrame(data_dict)
+      # pd.to_pickle(df, file_name)
+
+      opened = False
+      while not opened:
+        try:
+          earlier_df = pd.read_pickle(file_name)
+          opened = True
+        except:
+          pass
         
       df = pd.DataFrame(data_dict)
-      pd.to_pickle(df, file_name)
+      # pd.to_pickle(df, file_name)
 
-      # df_merged = pd.concat([earlier_df, df])
-      # pd.to_pickle(df_merged, file_name)
+      df_merged = pd.concat([earlier_df, df])
+      # df_merged = df_merged.reset_index()
+
+      t = datetime.now(pytz.timezone('America/Chicago')) # one hour early
+      print(t, t.hour, t.minute)
+      if  t.hour+1 >= 23 and t.minute > 50:
+        print('too late')
+      else:
+        try:
+          print('sending data to file')
+          pd.to_pickle(df_merged, file_name)
+        except:
+          pass
             
       break
 

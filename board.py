@@ -2,6 +2,8 @@ import random
 import copy
 import math
 import numpy as np
+
+
 from orient import generatePiecesDict, pieces
 
 PLAYERS = {
