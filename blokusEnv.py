@@ -15,22 +15,30 @@ piecesLenKey = [ 1, 2, 3, 4, 5, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 3, 5, 5, 5, 
 class BlokusEnv(ParallelEnv): 
     def __init__(self):
         self.board = Board(14)                           # Blokus board
-        self.state = self.board.asFlatNumpyArr()         # Flattened 14 by 14 (196) matrix of the board
+        # self.state = self.board.asFlatNumpyArr()         # Flattened 14 by 14 (196) matrix of the board
         self.possible_agents = [0,1]
 
     def reset(self, seed=None, options=None):
         self.agents = copy(self.possible_agents)
         self.board = Board(14)                           # Blokus board
-        self.state = self.board.asFlatNumpyArr()         # Flattened 14 by 14 (196) matrix of the board
+        # self.state = self.board.asFlatNumpyArr()         # Flattened 14 by 14 (196) matrix of the board
 
         observations = {
+            # 0: {
+            #     'board': self.state,
+            #     'pieces': self.board.inv,
+            # }, 
+            # 1: {
+            #     'board': self.state,
+            #     'pieces': self.board.inv,
+            # }, 
             0: {
-                'board': self.state,
-                'pieces': self.board.inv,
+                'board': np.array(self.board.board),
+                'pieces': np.ones([2,20]), 
             }, 
             1: {
-                'board': self.state,
-                'pieces': self.board.inv,
+                'board': np.array(self.board.board),
+                'pieces': np.ones([2,20]), 
             }, 
         }
         infos = {a: {} for a in self.agents}
@@ -73,7 +81,7 @@ class BlokusEnv(ParallelEnv):
 
         self.board.switchPlayer()
         
-        self.state = self.board.asFlatNumpyArr()
+        # self.state = self.board.asFlatNumpyArr()
 
         # Check if game is over
         terminations = {0: False, 1: False}
@@ -93,14 +101,22 @@ class BlokusEnv(ParallelEnv):
 
 
         observations = {
+            # 0: {
+            #     'board': self.state,
+            #     'pieces': piecesMB,
+            # }, 
+            # 1: {
+            #     'board': self.state,
+            #     'pieces': piecesMB,
+            # },
             0: {
-                'board': self.state,
-                'pieces': piecesMB,
+                'board': np.array(self.board.board),
+                'pieces': np.ones([2,20]), 
             }, 
             1: {
-                'board': self.state,
-                'pieces': piecesMB,
-            }, 
+                'board': np.array(self.board.board),
+                'pieces': np.ones([2,20]), 
+            },  
         }
 
         infos = {a: {} for a in self.agents}
