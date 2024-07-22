@@ -599,7 +599,7 @@ class Board:
         return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select)
         
         
-    def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False):
+    def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False, value_net=None):
         current_player = 1
         canonical_board = copy.deepcopy(self)
         canonical_board.board = self.get_flipped_board(self, current_player)
@@ -657,7 +657,7 @@ class Board:
             return 0
 
     
-    def monte_carlo_search(self, state, to_play, weights, player, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+    def monte_carlo_search(self, state, to_play, weights, player, num_sims, value_net=None):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
@@ -681,7 +681,7 @@ class Board:
             
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
-            value = next_state.move_reward(next_state, weights, player)
+            value = next_state.move_reward(next_state, weights, player, value_net=None)
             if value == 1:
                 i = num_sims
                 
@@ -702,13 +702,17 @@ class Board:
         return root
         
         
-    def move_reward(self, board, weights, player_num):
+    def move_reward(self, board, weights, player_num, value_net=None):
         # this function is extremely messy and improper,  pls ignore but is there is a better way lmk. There def is a better way
         if player_num == 1:
             player = 1
             if len(board.calculateLegalMoves()) != 0:
-                score = -board.calculate_board_score_mcts(board, weights)
-                # print(score, 'the score of the possible move')
+                if value_net == None:
+                    score = -board.calculate_board_score_mcts(board, weights)
+                else:
+                    to_pred = np.array((tuple(board.board)))
+                    to_pred = to_pred[np.newaxis, :, :, np.newaxis]
+                    score = value_net.predict(to_pred)
                 return score # must be between (1, -1)    
             else:
                 # print(board.score, player, 'score and turn 1 -- ', board.to_play, 'to play')

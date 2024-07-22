@@ -1,17 +1,37 @@
 from board import Board
 import math, random, time
-import csv
+import os
 import numpy as np
 import pandas as pd
 import time
 from datetime import datetime
 import pytz
+import pickle
 
-number_of_simulations = 200000000000000
+print("Numpy Version: ", np.__version__)
+if np.__version__ == '2.0.0':
+   raise ValueError('WRONG VERSION OF NUMPY')
+
+number_of_simulations = 200000000
 PRINT_BOARD = True 
 
-file_name = 'Data/playing_data.pkl'
+new_file = False
+file_num = 1
+
+while not new_file:
+  file_name = 'Data/playing_data/c' + str(file_num) + '.pkl'
+  if not os.path.exists(file_name): 
+      with open(file_name, 'w') as file: 
+          file.write("") 
+          break
+  else: 
+    file_num = int(file_num) + 1
+
+file_name = 'Data/playing_data/c' + str(file_num) + '.pkl'
+print("Printing to " + file_name)
 states_collected = []
+hourly_saves = []
+data = pd.DataFrame()
 
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
 
@@ -33,10 +53,37 @@ def randWeights():
     return [w1, w2, w3, w4, w5, w6, w7, w8, w9, rounds_only_5s, rounds_choosing_only_difficult_pieces, num_of_difficult_pieces_included] 
   
 
-for i in range(number_of_simulations):
+def loadall(filename):
+  data = []
+  with open(filename, "rb") as f:
+      while True:
+          try:
+              df = pickle.load(f)
+              data.append(df)
+          except EOFError:
+              break
+  return data
+
+# load in models
+import tensorflow as tf
+
+value_net_path = "models/value_net_basic.keras"
+value_network = tf.keras.models.load_model(value_net_path)
+value_network.summary()
+
+# policy_net_path = "models/policy_net_basic.keras"
+# policy_network_saved = tf.keras.models.load_model(policy_net_path)
+# policy_network_saved.summary()
+
+
+sim_num = 0
+while sim_num < number_of_simulations:
+  sim_num += 1
   init_time = time.time()
   board = Board(14)  
-  num_sims = [random.randint(100,1500), random.randint(100,1500)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  num_sims = [random.randint(700,2300), random.randint(700,2300)]  
+  # num_sims = [random.randint(100,2000), random.randint(100,2000)]  
+  # num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
@@ -46,9 +93,9 @@ for i in range(number_of_simulations):
         board.rand_monte_carlo_turn: 'random_monteCarlo'
       }
 
-  player_type = random.choices(player_types, weights=(25, 2, 30), k=1)[0]
+  player_type = random.choices(player_types, weights=(25, 10, 70), k=1)[0]
   if player_type == board.monte_carlo_turn:
-    opp_type = random.choices(player_types, weights=(25, 2, 30), k=1)[0]
+    opp_type = random.choices(player_types, weights=(25, 10, 70), k=1)[0]
   else:
     opp_type = board.monte_carlo_turn
     
@@ -115,7 +162,7 @@ for i in range(number_of_simulations):
             
     elif board.state == 'p2_turn':
       if opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn:
-        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1])
+        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1], value_model=value_network)
       else:
         for level in opp_levels:
           if poss_moves > level[0]:
@@ -162,28 +209,40 @@ for i in range(number_of_simulations):
             data_dict['Num_Sims'].append(num_sims[n])
             data_dict['mc_type'].append(mc_type[n])
             data_dict['inv_left'].append(inv_left[n])
-      
-      # df = pd.DataFrame(data_dict)
-      # pd.to_pickle(df, file_name)
 
-      opened = False
-      while not opened:
-        try:
-          earlier_df = pd.read_pickle(file_name)
-          opened = True
-          
-          df = pd.DataFrame(data_dict)
-          # pd.to_pickle(df, file_name)
+      data = pd.concat([data, pd.DataFrame(data_dict)])
+  
 
-          df_merged = pd.concat([earlier_df, df])
+      t = datetime.now(pytz.timezone('America/Chicago')) # one hour early
+      print(t)
 
-          print('sending data to file')
-          pd.to_pickle(df_merged, file_name)
-              
-          temp = pd.read_pickle(file_name)
-        except:
-          pass
-        
-            
+      if (t.hour+1 >= 10 and t.minute >= 20) and (t.hour+1 <= 14):
+          print('time is up!')
+          sim_num = math.inf
+          break
+      elif  t.minute % 50 <= 15:
+          hourly_saves.append(data)
+          print('hourly save to file!', file_name)
+          with open(file_name, "wb") as f:
+            for value in hourly_saves:
+                try:
+                  pickle.dump(value, f)
+                  print("sent")
+                except:
+                    print("failed the hourly save")
+          data = pd.DataFrame()
+    
       break
 
+hourly_saves.append(data)
+
+with open(file_name, "wb") as f:
+    for value in hourly_saves:
+        print(value.shape)
+        try:
+          pickle.dump(value, f)
+        except:
+           print("couldn't save")
+           pass
+
+print('finial save : ', file_name)
