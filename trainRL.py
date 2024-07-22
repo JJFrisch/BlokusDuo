@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 "checkpoint_config": {
                     "checkpoint_frequency": 5,
                 },
-                "no_done_at_end": False, #tensorboard --logdir /tmp/ray/session_2024-07-22_16-01-55_977007_24264/artifacts/2024-07-22_16-01-58/PPO_2024-07-22_16-01-58/driver_artifacts
+                "no_done_at_end": False, 
             },
             stop={
                 "training_iteration": 10,
