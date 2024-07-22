@@ -271,7 +271,7 @@ class Board:
 
         
     def randomTurn(self, not_to_use, not_to_use2): #JF
-        all_moves = self.calculateLegalMoves(only_fives_rounds=3)
+        all_moves = self.calculateLegalMoves(only_fives_rounds=0)
 
         if len(all_moves) > 0:
             move = random.choice(all_moves)
