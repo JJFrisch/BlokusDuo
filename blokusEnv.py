@@ -44,10 +44,13 @@ class BlokusEnv(ParallelEnv):
         return observations, infos
 
     def step(self, actions):
+        print("Actioning agents: ", actions.keys())
+        print("Recorded agents: ", self.agents)
         print(actions)
 
-        rewards = {agent: 0 for agent in self.agents}
-        terminations = {0: False, 1: False}
+        rewards = {agent: 0 for agent in self.possible_agents}
+        # terminations = {0: False, 1: False}
+        terminations = {a: a not in self.agents for a in self.possible_agents}
         #Get actions
         # Check if the move is valid and place it + reward
         # TODO: Action mask invalid moves
@@ -65,6 +68,7 @@ class BlokusEnv(ParallelEnv):
             if not valid1Found:
                 self.board.randomTurn(None, None)
                 rewards[0] = -50
+                print("INVALID MOVE SELECTED")
             if self.board.calculateLegalMoves()==[]:
                 terminations[0] = True
 
@@ -81,6 +85,7 @@ class BlokusEnv(ParallelEnv):
             if not valid2Found:
                 self.board.randomTurn(None, None)
                 rewards[1] = -50
+                print("INVALID MOVE SELECTED")
             if self.board.calculateLegalMoves()==[]:
                 terminations[1] = True
             # action2 = self._index_to_action(actions[1], self.action_space(1))
@@ -99,6 +104,7 @@ class BlokusEnv(ParallelEnv):
         
         
         if terminations[0] and terminations[1]:
+            print("GAME OVER")
             if self.board.score[0] > self.board.score[1]:
                 rewards[0] += 100
                 rewards[1] -= 100
@@ -120,27 +126,37 @@ class BlokusEnv(ParallelEnv):
                 piecesMB[1][piece-1] = 1
 
         # action_masks = {a: self._get_action_mask(a) for a in self.agents}
-        observations = {
-            0: {
-                'board': np.array(self.board.board),
-                'pieces': np.array(piecesMB), 
-                # 'action_mask': action_masks[0],  # Include action mask
-            }, 
-            1: {
-                'board': np.array(self.board.board),
-                'pieces': np.array(piecesMB), 
-                # 'action_mask': action_masks[1],  # Include action mask
-            },  
-        }
+        # observations = {
+        #     0: {
+        #         'board': np.array(self.board.board),
+        #         'pieces': np.array(piecesMB), 
+        #         # 'action_mask': action_masks[0],  # Include action mask
+        #     }, 
+        #     1: {
+        #         'board': np.array(self.board.board),
+        #         'pieces': np.array(piecesMB), 
+        #         # 'action_mask': action_masks[1],  # Include action mask
+        #     },  
+        # }
+        observations = {a: {'board': np.array(self.board.board), 'pieces': np.array(piecesMB)} for a in self.agents}
 
         infos = {a: {} for a in self.agents}
 
         self.render()
+        print(terminations)
+        print("Before elimatination ", self.agents)
 
-        if 0 in self.agents and terminations[0]: 
-            self.agents.remove(0)
-        if 1 in self.agents and terminations[1]: 
-            self.agents.remove(1)
+        if 0 in self.agents and 1 in self.agents and terminations[0]: 
+            self.agents.pop(0)
+        if 0 in self.agents and 1 not in self.agents and terminations[0]: 
+            self.agents.pop(0)
+        if 1 in self.agents and 0 not in self.agents and terminations[1]: 
+            self.agents.pop(0)
+        if 1 in self.agents and 0 in self.agents and terminations[1]: 
+            self.agents.pop(1)
+
+        print("After elimatination ", self.agents, "\n")
+
         return observations, rewards, terminations, truncations, infos
 
     def render(self):
