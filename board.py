@@ -744,7 +744,7 @@ class Board:
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
                     value = value_net.predict(to_pred)
                     score = -board.calculate_board_score_mcts(board, weights)
-                    score = (value + 2*score) / 3
+                    score = (value + 0*score) / 1
                 # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)    
             else:
@@ -770,7 +770,7 @@ class Board:
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
                     value = value_net.predict(to_pred)
                     score = -board.calculate_board_score_mcts(board, weights)
-                    score = (value + score) / 2
+                    score = (value + 2*score) / 3
                 return score
             else:
                 # print(board.score, player, 'score and turn 2')

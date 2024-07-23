@@ -1,6 +1,7 @@
 from board import Board
 import math, random, time
 import os
+import tensorflow as tf
 import numpy as np
 import pandas as pd
 import time
@@ -10,6 +11,7 @@ import pickle
 import gzip
 
 print("Numpy Version: ", np.__version__)
+print("TF Version: ", tf.__version__)
 if np.__version__ == '2.0.0':
    raise ValueError('WRONG VERSION OF NUMPY')
 
@@ -66,8 +68,6 @@ def loadall(filename):
   return data
 
 # load in models
-import tensorflow as tf
-
 value_net_path = "models/value_net_basic.keras"
 value_network = tf.keras.models.load_model(value_net_path)
 value_network.summary()
@@ -83,7 +83,7 @@ while sim_num < number_of_simulations:
   init_time = time.time()
   board = Board(14)  
   # num_sims = [random.randint(700,2300), random.randint(700,2300)]  
-  # num_sims = [random.randint(100,2000), random.randint(100,2000)]  
+  # num_sims = [random.randint(400,420), random.randint(400,420)]  
   num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
