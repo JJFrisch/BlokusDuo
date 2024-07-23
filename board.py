@@ -15,6 +15,13 @@ piece_id = {1: "i1", 2: "i2", 3: "i3", 4: "quadruple line", 5: "quintuple line",
 piece_possible_orientations = [[0], [0,1], [0,1], [0,1], [0,1], [0,1,4,5], [0,1,2,3], [0,1,2,3,4,5,6,7], [0], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3], [0], [0,1,4,5], [0,1,2,3], [0,1,2,3], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7]]
 pieces = generatePiecesDict(pieces) 
 
+all_poss_moves = []
+for x in range(14):
+  for y in range(14):
+     for piece in range(21):
+        for orient in range(8):
+           all_poss_moves.append([x,y,piece, orient])
+
 class Board:
     '''
     Board class initialization
@@ -200,7 +207,9 @@ class Board:
                                             if not self.is_valid_to_place_here(x_prime, y_prime):
                                                 break
                                         else:
-                                            legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
+                                            move = [center[0], center[1], piece_num, orientation_number]
+                                            if move not in legal_placements:
+                                                legal_placements.append(move)
         return legal_placements
     
     
@@ -221,7 +230,7 @@ class Board:
                                 # print("checking this orientation now:", orientation_number)
                                 orientation = pieces[piece_num][orientation_number] # should contain [[blocks from center], [ne], [se], etc]
                                 for dir in range(4):
-                                    for pieceBlock in orientation[dir + 1]:
+                                    for pieceBlock in orientation[dir]:
                                         center = [ x + (-1*pieceBlock[0]), y + (-1*pieceBlock[1]) ]
                                         if not self.is_valid_to_place_here(center[0], center[1]):
                                             break
@@ -232,16 +241,18 @@ class Board:
                                             if not self.is_valid_to_place_here(x_prime, y_prime):
                                                 break
                                         else:
-                                            legal_placements.append([center[0], center[1], piece_num, orientation_number, poss_squares_index, dir])
+                                            move = [center[0], center[1], piece_num, orientation_number]
+                                            if move not in legal_placements:
+                                                legal_placements.append(move)
         return legal_placements
         
     def place_piece(self, move): #JF
         # print(move)
-        x, y, piece_num, orientation_number, poss_squares_i, dir = move
+        x, y, piece_num, orientation_number = move
 
         #update score
         self.score[self.turn-1] += 1 + len(pieces[piece_num][orientation_number][0])
-        self.possible_squares[self.turn-1].pop(poss_squares_i)
+        # self.possible_squares[self.turn-1].pop(poss_squares_i)
 
         #change board by putting down the peice
         self.board[y][x] = self.to_play
@@ -595,8 +606,8 @@ class Board:
 
         # self.switchPlayer()
         
-    def rand_monte_carlo_turn(self, weights, current_player, num_sims=50, rand_select=True):
-        return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select)
+    def rand_monte_carlo_turn(self, weights, current_player, num_sims=50, rand_select=True, value_net=None):
+        return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select, value_net=value_net)
         
         
     def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False, value_net=None):
@@ -612,21 +623,40 @@ class Board:
             reward = self.get_reward_for_player(self, player)
             print(reward, 'reward!')
             ret = []
+            reward_mod = 1
+            if player == 2:
+                reward_mod = -1
             for hist_state, hist_current_player, hist_action_probs, hist_moves in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
-                ret.append( [hist_state, hist_moves, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
+                # print(reward, self.to_play, reward)
+                if reward == -1:
+                    hist_state = self.get_flipped_state(hist_state, -1)
+                hist_moves_probs = []
+                # print(hist_moves[:20])
+                changes = 0
+                for poss_move in all_poss_moves:
+                    if poss_move in hist_moves:
+                        index = hist_moves.index(poss_move)
+                        # print(index, hist_action_probs[index], 'index', 'probability')
+                        changes += 1
+                        hist_moves_probs.append(hist_action_probs[index])
+                    else:
+                        hist_moves_probs.append(0)
+                ret.append( [hist_state, hist_moves, hist_moves_probs, reward*reward_mod] )
+                reward_mod = reward_mod * -1
             return ret
         else:
-            root = self.monte_carlo_search(canonical_board, current_player, weights, player, num_sims)
+            root = self.monte_carlo_search(canonical_board, current_player, weights, player, num_sims, value_net=value_net)
                 
             action_probs = []
             moves = []
             for move, node in root.children:
                 action_probs.append(node.visit_count)
-                moves.append(move)
+                moves.append(move[:4])
                 
             action_probs = action_probs / np.sum(action_probs)
-            self.train_examples.append([canonical_board.board, current_player, action_probs, moves])
+                
+            self.train_examples.append([canonical_board.board, player, action_probs, moves])
 
             action = root.choose_move(rand_select=rand_select)
             print(action, "this is the root's selected action") 
@@ -657,7 +687,7 @@ class Board:
             return 0
 
     
-    def monte_carlo_search(self, state, to_play, weights, player, num_sims, value_net=None):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+    def monte_carlo_search(self, state, to_play, weights, player, num_sims, value_net):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
         root = Node(0, to_play)
         
         poss_moves = state.calculateLegalMoves()
@@ -667,7 +697,7 @@ class Board:
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
         print(num_sims, 'num sims')
         for i in range(num_sims):
-            # if i % 1 == 0:
+            # if i % 100 == 0:
             #     print(i, ' the itteration of simulations') # lag occurs between here and score / value calculations
             node = root
             search_path = [root]
@@ -681,7 +711,7 @@ class Board:
             
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
-            value = next_state.move_reward(next_state, weights, player, value_net=None)
+            value = next_state.move_reward(next_state, weights, player, value_net)
             if value == 1:
                 i = num_sims
                 
@@ -702,17 +732,20 @@ class Board:
         return root
         
         
-    def move_reward(self, board, weights, player_num, value_net=None):
+    def move_reward(self, board, weights, player_num, value_net):
         # this function is extremely messy and improper,  pls ignore but is there is a better way lmk. There def is a better way
         if player_num == 1:
             player = 1
             if len(board.calculateLegalMoves()) != 0:
-                if value_net == None:
+                if value_net != None:
                     score = -board.calculate_board_score_mcts(board, weights)
                 else:
-                    to_pred = np.array((tuple(board.board)))
+                    to_pred = np.array(tuple(board.board))
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
-                    score = value_net.predict(to_pred)
+                    value = value_net.predict(to_pred)
+                    score = -board.calculate_board_score_mcts(board, weights)
+                    score = (value + 2*score) / 3
+                # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)    
             else:
                 # print(board.score, player, 'score and turn 1 -- ', board.to_play, 'to play')
@@ -730,9 +763,15 @@ class Board:
         if player_num == 2:
             player = 2
             if len(board.calculateLegalMoves()) != 0:
-                score = -board.calculate_board_score_mcts(board, weights)
-                # print(score, 'the score of the possible move')
-                return score # must be between (1, -1)
+                if value_net != None:
+                    score = -board.calculate_board_score_mcts(board, weights)
+                else:
+                    to_pred = np.array(tuple(board.board))
+                    to_pred = to_pred[np.newaxis, :, :, np.newaxis]
+                    value = value_net.predict(to_pred)
+                    score = -board.calculate_board_score_mcts(board, weights)
+                    score = (value + score) / 2
+                return score
             else:
                 # print(board.score, player, 'score and turn 2')
                 if board.score[player-1] < board.score[2-player]:
@@ -761,7 +800,9 @@ class Board:
     def get_flipped_board(self, board, player): # i lie
         return [[j*player for j in i] for i in board.board]
     
-    
+    def get_flipped_state(self, state, player): # i lie
+        return [[j*player for j in i] for i in state]
+
     def get_next_state(self, board1, move, node):   
         board = copy.deepcopy(board1)
         board.place_piece(move)
@@ -783,40 +824,42 @@ class Board:
         starting_pos = [[4,4], [9,9]]
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
 
-        if board.turn_count >= 35:
+        if board.turn_count > 20:
             score += w7 * (board.score[board.turn-1] - board.score[2-board.turn])
-        
+            best_possible_score = 35 * w7
+            score = score/best_possible_score
         else:
             for opp_dot in board.possible_squares[2 - board.turn]:
-                score -= w1 + (w2- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
-                score -= w3 * sum(opp_dot[2])
+                    score -= w1 + (w2- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                    score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[board.turn-1]:
-                score += w4 + (w5- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
-                score += w6 * sum(my_dot[2])
+                    score += w4 + (w5- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                    score += w6 * sum(my_dot[2])
 
             score += w7 * board.score[board.turn-1]
             score -= w8 * board.score[2-board.turn]
             # add in score += w9 * (total_inv_score - current_inv_score)
             
             
-        best_possible_score = 0
-        worst_possible_score = 0
-        worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
-        worst_possible_score -= w3 * 4
-        worst_possible_score *=  30#len(board.possible_squares[board.turn-1]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
-        best_possible_score += w4 + (w5- math.log(0.001 * 40)) * (20)
-        best_possible_score += w6 * 4
-        best_possible_score *=  30#len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
-        worst_possible_score -= 75 * w8
-        best_possible_score += 75 * w7
-        
-        if score > 0:
-            score = score/best_possible_score
-        elif score < 0:
-            score = score/abs(worst_possible_score)
-        # print(score, 'score make sure between 0-1')
-        if abs(score) >= 1:
-            print('ERROR SCORE TOO HIGH, is more than 1,-1')
+            best_possible_score = 0
+            worst_possible_score = 0
+            worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
+            worst_possible_score -= w3 * 4
+            worst_possible_score *=  30#len(board.possible_squares[board.turn-1]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
+            best_possible_score += w4 + (w5- math.log(0.001 * 40)) * (20)
+            best_possible_score += w6 * 4
+            best_possible_score *=  30#len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
+            worst_possible_score -= 75 * w8
+            best_possible_score += 75 * w7
+            
+            if score > 0:
+                score = score/best_possible_score
+            elif score < 0:
+                score = score/abs(worst_possible_score)
+            # print(score, 'score make sure between 0-1')
+            if abs(score) >= 1:
+                print('ERROR SCORE TOO HIGH, is more than 1,-1')
+
         return score
             
 

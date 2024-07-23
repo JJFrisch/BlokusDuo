@@ -7,12 +7,13 @@ import time
 from datetime import datetime
 import pytz
 import pickle
+import gzip
 
 print("Numpy Version: ", np.__version__)
 if np.__version__ == '2.0.0':
    raise ValueError('WRONG VERSION OF NUMPY')
 
-number_of_simulations = 200000000
+number_of_simulations = 1
 PRINT_BOARD = True 
 
 new_file = False
@@ -81,9 +82,9 @@ while sim_num < number_of_simulations:
   sim_num += 1
   init_time = time.time()
   board = Board(14)  
-  num_sims = [random.randint(700,2300), random.randint(700,2300)]  
+  # num_sims = [random.randint(700,2300), random.randint(700,2300)]  
   # num_sims = [random.randint(100,2000), random.randint(100,2000)]  
-  # num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
@@ -152,7 +153,7 @@ while sim_num < number_of_simulations:
     if board.state == 'p1_turn':
 
       if player_type == board.rand_monte_carlo_turn or player_type == board.monte_carlo_turn:
-        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0])
+        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0], value_net=value_network)
       else:
         for level in player_levels:
           if poss_moves > level[0]:
@@ -162,7 +163,7 @@ while sim_num < number_of_simulations:
             
     elif board.state == 'p2_turn':
       if opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn:
-        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1], value_model=value_network)
+        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1], value_net=value_network)
       else:
         for level in opp_levels:
           if poss_moves > level[0]:
@@ -216,14 +217,14 @@ while sim_num < number_of_simulations:
       t = datetime.now(pytz.timezone('America/Chicago')) # one hour early
       print(t)
 
-      if (t.hour+1 >= 10 and t.minute >= 20) and (t.hour+1 <= 14):
+      if (t.hour+1 >= 1 and t.minute >= 0) and (t.hour+1 <= 3):
           print('time is up!')
           sim_num = math.inf
           break
-      elif  t.minute % 50 <= 15:
+      elif  t.minute % 60 <= 28:
           hourly_saves.append(data)
           print('hourly save to file!', file_name)
-          with open(file_name, "wb") as f:
+          with gzip.open(file_name, "wb", compresslevel=9) as f:
             for value in hourly_saves:
                 try:
                   pickle.dump(value, f)
@@ -231,18 +232,19 @@ while sim_num < number_of_simulations:
                 except:
                     print("failed the hourly save")
           data = pd.DataFrame()
+
     
       break
 
 hourly_saves.append(data)
 
-with open(file_name, "wb") as f:
+with gzip.open(file_name, "wb", compresslevel=9) as f:
     for value in hourly_saves:
         print(value.shape)
         try:
           pickle.dump(value, f)
         except:
-           print("couldn't save")
+           print("couldn't save the hour")
            pass
 
 print('finial save : ', file_name)
