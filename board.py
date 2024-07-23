@@ -824,7 +824,7 @@ class Board:
         starting_pos = [[4,4], [9,9]]
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
 
-        if board.turn_count > 20:
+        if board.turn_count < 80:
             score += w7 * (board.score[board.turn-1] - board.score[2-board.turn])
             best_possible_score = 35 * w7
             score = score/best_possible_score
