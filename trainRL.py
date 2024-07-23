@@ -1,9 +1,10 @@
 import ray
 from ray import tune
 from ray.rllib.algorithms.ppo import PPO
-from ray.rllib.env import ParallelPettingZooEnv
+from ray.rllib.env import PettingZooEnv, ParallelPettingZooEnv
 from ray.tune.registry import register_env
 from ray.rllib.algorithms.callbacks import DefaultCallbacks
+from pettingzoo.utils.conversions import aec_to_parallel
 
 import traceback
 
@@ -12,10 +13,12 @@ import GPUtil
 from blokusEnv import BlokusEnv
 
 def env_creator(config):
-    return ParallelPettingZooEnv(BlokusEnv())
+    # return PettingZooEnv(BlokusEnv())
+    ParallelPettingZooEnv(aec_to_parallel(BlokusEnv()))
 
 # Register the environment
-register_env("blokus_env", env_creator)
+# register_env("blokus_env_v2", env_creator)
+register_env("blokus_env_AEC", lambda config: env_creator(config))
 
 def policy_mapping_fn(agent_id, *args, **kwargs):
     return "player_0" if agent_id == "player_0" else "player_1"
@@ -45,7 +48,7 @@ if __name__ == "__main__":
         tune.run(
             PPO,
             config={
-                "env": "blokus_env",
+                "env": "blokus_env_v2",
                 "framework": "torch",
                 "num_workers": 1,  # Increase this for parallelism
                 "num_gpus": 0,  # Set to 1 if you have a GPU

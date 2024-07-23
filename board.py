@@ -898,3 +898,4 @@ class Node:
         prior = "{0:.2f}".format(self.prior)
         print("{} Prior: {} Count: {} Value: {}".format(self.state.__str__(), prior, self.visit_count, self.value()))
         print('children ', dict(list(self.children)[0: 5]))
+    

@@ -16,3 +16,5 @@ https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUD
 
 ### Blokus Statistical Data spreadsheet
 https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
+
+`aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower). 
