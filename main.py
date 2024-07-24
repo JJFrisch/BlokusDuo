@@ -1,9 +1,9 @@
 from board import Board
 import math, random, time
 import os
+import pandas as pd
 import tensorflow as tf
 import numpy as np
-import pandas as pd
 import time
 from datetime import datetime
 import pytz
@@ -39,15 +39,15 @@ data = pd.DataFrame()
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]
 
 def randWeights():
-    w1 = random.uniform(1, 60)
-    w2 = random.uniform(1, 60)
-    w3 = random.uniform(1, 60)
-    w4 = random.uniform(1, 60)
-    w5 = random.uniform(1, 60)
-    w6 = random.uniform(1, 60)
-    w7 = random.uniform(1, 60)
-    w8 = random.uniform(1, 60)
-    w9 = random.uniform(1, 60)
+    w1 = random.uniform(1, 15)
+    w2 = random.uniform(1, 2)
+    w3 = random.uniform(1, 2)
+    w4 = random.uniform(1, 15)
+    w5 = random.uniform(1, 2)
+    w6 = random.uniform(1, 3)
+    w7 = random.uniform(1, 20)
+    w8 = random.uniform(1, 20)
+    w9 = random.uniform(1, 3)
     
     rounds_only_5s = random.randint(0,10)
     rounds_choosing_only_difficult_pieces = random.randint(0,8)
@@ -82,9 +82,9 @@ while sim_num < number_of_simulations:
   sim_num += 1
   init_time = time.time()
   board = Board(14)  
-  # num_sims = [random.randint(700,2300), random.randint(700,2300)]  
+  num_sims = [random.randint(700,2300), random.randint(700,2300)]  
   # num_sims = [random.randint(400,420), random.randint(400,420)]  
-  num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
+  # num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
@@ -153,7 +153,7 @@ while sim_num < number_of_simulations:
     if board.state == 'p1_turn':
 
       if player_type == board.rand_monte_carlo_turn or player_type == board.monte_carlo_turn:
-        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0], value_net=value_network)
+        states_collected[0] = player_type(p1_weights, 1, num_sims=num_sims[0], value_net=None)
       else:
         for level in player_levels:
           if poss_moves > level[0]:
@@ -163,7 +163,7 @@ while sim_num < number_of_simulations:
             
     elif board.state == 'p2_turn':
       if opp_type == board.rand_monte_carlo_turn or opp_type == board.monte_carlo_turn:
-        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1], value_net=value_network)
+        states_collected[1] = opp_type(p2_weights, 2, num_sims=num_sims[1], value_net=None)
       else:
         for level in opp_levels:
           if poss_moves > level[0]:

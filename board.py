@@ -737,14 +737,14 @@ class Board:
         if player_num == 1:
             player = 1
             if len(board.calculateLegalMoves()) != 0:
-                if value_net != None:
+                if value_net == None:
                     score = -board.calculate_board_score_mcts(board, weights)
                 else:
                     to_pred = np.array(tuple(board.board))
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
-                    value = value_net.predict(to_pred)
+                    value = -value_net.predict(to_pred, verbose=0)
                     score = -board.calculate_board_score_mcts(board, weights)
-                    score = (value + 0*score) / 1
+                    score = (value + 5*score) / 6
                 # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)    
             else:
@@ -763,12 +763,12 @@ class Board:
         if player_num == 2:
             player = 2
             if len(board.calculateLegalMoves()) != 0:
-                if value_net != None:
+                if value_net == None:
                     score = -board.calculate_board_score_mcts(board, weights)
                 else:
                     to_pred = np.array(tuple(board.board))
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
-                    value = value_net.predict(to_pred)
+                    value = -value_net.predict(to_pred, verbose=0)
                     score = -board.calculate_board_score_mcts(board, weights)
                     score = (value + 2*score) / 3
                 return score
@@ -824,9 +824,9 @@ class Board:
         starting_pos = [[4,4], [9,9]]
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
 
-        if board.turn_count < 80:
+        if board.turn_count > 8:
             score += w7 * (board.score[board.turn-1] - board.score[2-board.turn])
-            best_possible_score = 35 * w7
+            best_possible_score = 12 * w7
             score = score/best_possible_score
         else:
             for opp_dot in board.possible_squares[2 - board.turn]:
