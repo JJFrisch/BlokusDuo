@@ -33,7 +33,6 @@ while not new_file:
 file_name = 'Data/playing_data/c' + str(file_num) + '.pkl'
 print("Printing to " + file_name)
 states_collected = []
-hourly_saves = []
 data = pd.DataFrame()
 
 standard_weights = [37, 12, 31, 12, 20, 15, 25, 25, 25, 0,0,0]

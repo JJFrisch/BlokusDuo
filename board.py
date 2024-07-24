@@ -909,7 +909,8 @@ class Node:
                 
         
     def ucb_score(self, parent, child):
-        prior_score = child.prior * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
+        prior_score = 3 * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
+        # prior_score = child.prior * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
         if child.visit_count > 0:
             value_score = child.value() # might be negative, check later
         else:
