@@ -13,6 +13,13 @@ piece_id = {1: "i1", 2: "i2", 3: "i3", 4: "quadruple line", 5: "quintuple line",
 piece_possible_orientations = [[0], [0,1], [0,1], [0,1], [0,1], [0,1,4,5], [0,1,2,3], [0,1,2,3,4,5,6,7], [0], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3], [0], [0,1,4,5], [0,1,2,3], [0,1,2,3], [0,1,2,3], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7], [0,1,2,3,4,5,6,7]]
 pieces = generatePiecesDict(pieces) 
 
+all_poss_moves = []
+for x in range(14):
+  for y in range(14):
+     for piece in range(21):
+        for orient in range(8):
+           all_poss_moves.append([x,y,piece, orient])
+
 class Board:
     '''
     Board class initialization
@@ -278,15 +285,17 @@ class Board:
 
 
 
-    def randomTurn(self, not_to_use, not_to_use2): #JF
+    def randomTurn(self, place=True): #JF
         all_moves = self.calculateLegalMoves(only_fives_rounds=3)
 
         if len(all_moves) > 0:
             move = random.choice(all_moves)
-            self.place_piece(move)
+            if place:
+                self.place_piece(move)
+            else:
+                return move
         else:
             self.finished[self.turn-1] = True
-
         self.switchPlayer()
 
     def displayStateOfGame(self): #JF
@@ -525,41 +534,16 @@ class Board:
 
 
 
-    def playSmart(self, level, weights): #JF
+    def playSmart(self, level, weights, place=True): #JF
         best_move = self.smartTurn(0, weights)
+        if not place: return best_move
+
         if best_move == []:
             self.finished[self.turn-1] = True
         else:
             self.place_piece(best_move)
 
         self.switchPlayer()
-
-    # UI, etc. for a human to be able to play a piece
-    def humanTurn(self): #JF
-        legal_move = False
-        while not legal_move:
-            choice = int(input(f"Player {self.turn}'s turn. Choose a piece to place: "))
-
-            if choice == 'exit' or choice == 'quit':
-                self.running = False
-                return
-
-            x = int(input(f"Player {self.turn}'s turn. Choose the x coordinate of the piece: "))
-            y = int(input(f"Player {self.turn}'s turn. Choose the y coordinate of the piece: "))
-            orientaion = int(input(f"Player {self.turn}'s turn. Choose the orientation of the piece: "))
-            legal_move = self.is_valid_to_place_here(x,y)
-            move = [x, y, choice, orientaion, 0, 0]
-            # if legal_move:
-            #     legal_move = self.is_legal_move(x, y, choice, orientaion)
-            # if legal_move:
-            #     break
-            # print("NOOOOOOOOOOOOOOOOOO try again")
-
-        self.place_piece(move)
-        print(self.inv[self.turn-1])
-        print(self.score)
-        # self.switchPlayer()
-
 
         def squareDiff(self): 
             return self.score[0]-self.score[1]
@@ -602,11 +586,11 @@ class Board:
 
         # self.switchPlayer()
 
-    def rand_monte_carlo_turn(self, weights, current_player, num_sims=50, rand_select=True):
-        return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select)
-
-
-    def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False):
+    def rand_monte_carlo_turn(self, weights, current_player, num_sims=50, rand_select=True, value_net=None):
+        return self.monte_carlo_turn(weights, current_player, num_sims=num_sims, rand_select=rand_select, value_net=value_net)
+        
+        
+    def monte_carlo_turn(self, weights, player, num_sims=50, rand_select=False, value_net=None, place=True):
         current_player = 1
         canonical_board = copy.deepcopy(self)
         canonical_board.board = self.get_flipped_board(self, current_player)
@@ -614,32 +598,52 @@ class Board:
         num_moves = len(canonical_board.calculateLegalMoves())
 
         if num_moves == 0:
-            print("DONE : num_moves == 0")
+            # print("DONE : num_moves == 0")
             self.finished[2-self.turn] = True
             reward = self.get_reward_for_player(self, player)
-            print(reward, 'reward!')
+            # print(reward, 'reward!')
             ret = []
+            reward_mod = 1
+            if player == 2:
+                reward_mod = -1
             for hist_state, hist_current_player, hist_action_probs, hist_moves in self.train_examples:
                 # [Board, currentPlayer, actionProbabilities, Reward]
-                ret.append( [hist_state, hist_moves, list(hist_action_probs), reward * ((-1) ** (hist_current_player != current_player))] )
+                # print(reward, self.to_play, reward)
+                if reward == -1:
+                    hist_state = self.get_flipped_state(hist_state, -1)
+                hist_moves_probs = []
+                # print(hist_moves[:20])
+                changes = 0
+                for poss_move in all_poss_moves:
+                    if poss_move in hist_moves:
+                        index = hist_moves.index(poss_move)
+                        # print(index, hist_action_probs[index], 'index', 'probability')
+                        changes += 1
+                        hist_moves_probs.append(hist_action_probs[index])
+                    else:
+                        hist_moves_probs.append(0)
+                ret.append( [hist_state, hist_moves, hist_moves_probs, reward*reward_mod] )
+                reward_mod = reward_mod * -1
             return ret
         else:
-            root = self.monte_carlo_search(canonical_board, current_player, weights, player, num_sims)
-
+            root = self.monte_carlo_search(canonical_board, current_player, weights, player, num_sims, value_net=value_net)
+                
             action_probs = []
             moves = []
             for move, node in root.children:
                 action_probs.append(node.visit_count)
-                moves.append(move)
-
+                moves.append(move[:4])
+                
             action_probs = action_probs / np.sum(action_probs)
-            self.train_examples.append([canonical_board.board, current_player, action_probs, moves])
+                
+            self.train_examples.append([canonical_board.board, player, action_probs, moves])
 
             action = root.choose_move(rand_select=rand_select)
-            print(action, "this is the root's selected action") 
-
+            # print(action, "this is the root's selected action") 
+            
+            if not place: return action
             self.place_piece(action)
-
+            
             self.turn_count += 1
             self.to_play *= -1
             self.turn = 3 - self.turn
@@ -647,10 +651,10 @@ class Board:
                 self.state = 'p2_turn'
             else:
                 self.state = 'p1_turn'
+            
 
-
-
-
+                
+        
     def get_reward_for_player(self, board, player):
         # return None if not ended, 1 if player 1 wins, -1 if player 1 lost
         print(player, 'end of player')
@@ -663,18 +667,18 @@ class Board:
         else:
             return 0
 
-
-    def monte_carlo_search(self, state, to_play, weights, player, num_sims):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+    
+    def monte_carlo_search(self, state, to_play, weights, player, num_sims, value_net):   #https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
         root = Node(0, to_play)
-
+        
         poss_moves = state.calculateLegalMoves()
         # num_sims = len(poss_moves)*2
         # use a model.predict to get the action probabilities #will have to mask out illegal moves as well
         move_probs = [1/len(poss_moves) for i in range(len(poss_moves))] # for now will set all of the probs to be equal
         root.expand(copy.deepcopy(state), to_play, move_probs, poss_moves) #will set all the weights to 1/len(poss_moves) until the model actually gets good
-        print(num_sims, 'num sims')
+        # print(num_sims, 'num sims')
         for i in range(num_sims):
-            # if i % 1 == 0:
+            # if i % 100 == 0:
             #     print(i, ' the itteration of simulations') # lag occurs between here and score / value calculations
             node = root
             search_path = [root]
@@ -683,19 +687,19 @@ class Board:
                 j +=1
                 move, node = node.select_best_child()
                 search_path.append(node)
-
+                
             # print(j, 'num loops of expanded')    
-
+            
             parent = search_path[-2]
             next_state = parent.state.get_next_state(parent.state, move, parent)
-            value = next_state.move_reward(next_state, weights, player)
+            value = next_state.move_reward(next_state, weights, player, value_net)
             if value == 1:
                 i = num_sims
-
+                
             if value != 0:
                 # if the game has not ended
                 # expand!!
-
+                
                 # #eventually will want to use a model to predict the next state's 
                 # probability to choose each of the next actions. Will have to make sure to 
                 # get rid of any illegal moves still predicted by the model
@@ -704,17 +708,24 @@ class Board:
                 node.expand(next_state, parent.to_play *-1, move_probs, poss_moves)
 
             self.monte_back_prop(search_path, value, parent.to_play*-1)
-
-
+            
+        
         return root
-
-
-    def move_reward(self, board, weights, player_num):
+        
+        
+    def move_reward(self, board, weights, player_num, value_net):
         # this function is extremely messy and improper,  pls ignore but is there is a better way lmk. There def is a better way
         if player_num == 1:
             player = 1
             if len(board.calculateLegalMoves()) != 0:
-                score = -board.calculate_board_score_mcts(board, weights)
+                if value_net == None:
+                    score = -board.calculate_board_score_mcts(board, weights)
+                else:
+                    to_pred = np.array(tuple(board.board))
+                    to_pred = to_pred[np.newaxis, :, :, np.newaxis]
+                    value = -value_net.predict(to_pred, verbose=0)
+                    score = -board.calculate_board_score_mcts(board, weights)
+                    score = (value + 5*score) / 6
                 # print(score, 'the score of the possible move')
                 return score # must be between (1, -1)    
             else:
@@ -733,9 +744,15 @@ class Board:
         if player_num == 2:
             player = 2
             if len(board.calculateLegalMoves()) != 0:
-                score = -board.calculate_board_score_mcts(board, weights)
-                # print(score, 'the score of the possible move')
-                return score # must be between (1, -1)
+                if value_net == None:
+                    score = -board.calculate_board_score_mcts(board, weights)
+                else:
+                    to_pred = np.array(tuple(board.board))
+                    to_pred = to_pred[np.newaxis, :, :, np.newaxis]
+                    value = -value_net.predict(to_pred, verbose=0)
+                    score = -board.calculate_board_score_mcts(board, weights)
+                    score = (value + 2*score) / 3
+                return score
             else:
                 # print(board.score, player, 'score and turn 2')
                 if board.score[player-1] < board.score[2-player]:
@@ -749,7 +766,7 @@ class Board:
                     return 0
                 else:
                     print('HUUUUHHH')
-
+        
     def monte_back_prop(self, search_path, value, to_play):
         # NEED TO MAKE VALUE BETWEEN 0-1
         for node in reversed(search_path):
@@ -759,16 +776,18 @@ class Board:
             else:
                 node.value_sum -= value 
         return
-
-
+    
+    
     def get_flipped_board(self, board, player): # i lie
         return [[j*player for j in i] for i in board.board]
-
+    
+    def get_flipped_state(self, state, player): # i lie
+        return [[j*player for j in i] for i in state]
 
     def get_next_state(self, board1, move, node):   
         board = copy.deepcopy(board1)
         board.place_piece(move)
-
+        
         board.turn_count += 1
         board.to_play *= -1
         board.turn = 3 - board.turn
@@ -776,34 +795,33 @@ class Board:
             board.state = 'p2_turn'
         else:
             board.state = 'p1_turn'
-
+        
         return board
-
-
+    
+    
     def calculate_board_score_mcts(self, board, weights): #JF
         # w1, w2, w3, w4, w5, w6, w7, w8, w9, w10 = weights
         score = 0
         starting_pos = [[4,4], [9,9]]
         w1, w2, w3, w4, w5, w6, w7, w8, w9, x, y, z = weights
 
-        if board.turn_count > 4:
+        if board.turn_count > 8:
             score += w7 * (board.score[board.turn-1] - board.score[2-board.turn])
-            best_possible_score = 30 * w7
+            best_possible_score = 12 * w7
             score = score/best_possible_score
-            
         else:
             for opp_dot in board.possible_squares[2 - board.turn]:
-                score -= w1 + (w2- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
-                score -= w3 * sum(opp_dot[2])
+                    score -= w1 + (w2- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (opp_dot[0] - starting_pos[board.turn-1][0])**2 + (opp_dot[1] - starting_pos[board.turn-1][0])**2 ) ) )
+                    score -= w3 * sum(opp_dot[2])
             for my_dot in board.possible_squares[board.turn-1]:
-                score += w4 + (w5- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
-                score += w6 * sum(my_dot[2])
+                    score += w4 + (w5- math.log(0.001 * board.turn_count)) * (20 - ( math.sqrt( (my_dot[0] - starting_pos[2-board.turn][0])**2 + (my_dot[1] - starting_pos[2-board.turn][1])**2 ) ) )
+                    score += w6 * sum(my_dot[2])
 
             score += w7 * board.score[board.turn-1]
             score -= w8 * board.score[2-board.turn]
             # add in score += w9 * (total_inv_score - current_inv_score)
-
-
+            
+            
             best_possible_score = 0
             worst_possible_score = 0
             worst_possible_score -= w1 + (w2- math.log(0.001 * 40)) * (20)
@@ -814,7 +832,7 @@ class Board:
             best_possible_score *=  30#len(board.possible_squares[2 - board.turn]) # 30   # could be # of actual dots not the guessed 'max' for the # of opp_dots
             worst_possible_score -= 75 * w8
             best_possible_score += 75 * w7
-    
+            
             if score > 0:
                 score = score/best_possible_score
             elif score < 0:
@@ -822,36 +840,37 @@ class Board:
             # print(score, 'score make sure between 0-1')
             if abs(score) >= 1:
                 print('ERROR SCORE TOO HIGH, is more than 1,-1')
-        return score
 
+        return score
+            
 
 class Node:
     def __init__(self, prior, to_play):
         self.prior = prior
         self.to_play = to_play
-
+        
         self.children = [] # moves maps to the next node
         self.visit_count = 0
         self.value_sum = 0
         self.state = None
-
+        
     def value(self):
         if self.visit_count == 0:
             return 0
         return self.value_sum / self.visit_count
-
+    
     def expanded(self):
         return 0 < len(self.children)
-
+    
     def expand(self, state, to_play, move_probabilities, moves):
         self.to_play = to_play
         self.state = state
         for a, prob in enumerate(move_probabilities):
             if prob != 0:
                 self.children.append([moves[a], Node(prior=prob, to_play=self.to_play * -1)])
-
+        
         random.shuffle(self.children)
-
+                            
     def select_best_child(self):
         #get the child with the best ucb score
         best_child = None 
@@ -866,36 +885,36 @@ class Node:
                 best_ucb = ucb_score
                 best_child = child
                 best_move = move
-
+            
         return best_move, best_child
-
-
+                
+        
     def ucb_score(self, parent, child):
-        prior_score = child.prior * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
+        prior_score = 3 * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
+        # prior_score = child.prior * math.sqrt(np.log(parent.visit_count+1) / (child.visit_count + 1))
         if child.visit_count > 0:
             value_score = child.value() # might be negative, check later
         else:
             value_score = 0
-
+            
         return value_score + prior_score
-
-
+    
+    
     def choose_move(self, rand_select=False):
         if rand_select:
             return random.choice(self.children)[0]
-
+        
         best_move = -1
         most_visits = -math.inf
-
+        
         for move, child in self.children:
             if most_visits < child.visit_count:
                 best_move = move
                 most_visits = child.visit_count
-
+                
         return best_move
-
+    
     def info(self):
         prior = "{0:.2f}".format(self.prior)
         print("{} Prior: {} Count: {} Value: {}".format(self.state.__str__(), prior, self.visit_count, self.value()))
         print('children ', dict(list(self.children)[0: 5]))
-    
