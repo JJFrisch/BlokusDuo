@@ -70,8 +70,9 @@ for i in range(1):
                 # y      = int(input(": "))
                 # piece  = int(input(": "))
                 # orient = int(input(": "))
-                # act = actionToDiscrete([x, y, piece, orient])
-                act = display.humanTurn()
+                act = display.humanTurn(place=False)
+                act = actionToDiscrete(act)
+                
             else:
                 # Note: PettingZoo expects integer actions # TODO: change chess to cast actions to type int?
                 act = int(
