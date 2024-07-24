@@ -108,7 +108,7 @@ def eval_action_mask(env_fn, id, num_games=100, render_mode=None, **env_kwargs):
     # except ValueError:
     #     print("Policy not found.")
     #     exit(0)
-    latest_policy = f"final_models/final_model_{i}.zip"
+    latest_policy = f"final_models/final_model_{id}.zip"
 
     model = MaskablePPO.load(latest_policy)
 
@@ -117,7 +117,7 @@ def eval_action_mask(env_fn, id, num_games=100, render_mode=None, **env_kwargs):
     round_rewards = []
 
     for i in range(num_games):
-        env.reset(seed=i)
+        env.reset(seed=0)
         env.action_space(env.possible_agents[0]).seed(id)
 
         for agent in env.agent_iter():
