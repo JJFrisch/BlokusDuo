@@ -56,7 +56,8 @@ def mask_fn(env):
     # Do whatever you'd like in this function to return the action mask
     # for the current env. In this example, we assume the env has a
     # helpful method we can rely on.
-    return env.action_mask()
+    print('action mask', env.genActionMask().shape)
+    return env.genActionMask()
 
 
 def train_action_mask(env_fn, steps=10_000, seed=0, **env_kwargs):
@@ -70,12 +71,12 @@ def train_action_mask(env_fn, steps=10_000, seed=0, **env_kwargs):
 
     env.reset(seed=seed)  # Must call reset() in order to re-define the spaces
 
-    env = ActionMasker(env, mask_fn)  # Wrap to enable masking (SB3 function)
+    env = ActionMasker(env, "genActionMaskArgs")  # Wrap to enable masking (SB3 function)
     # MaskablePPO behaves the same as SB3's PPO unless the env is wrapped
     # with ActionMasker. If the wrapper is detected, the masks are automatically
     # retrieved and used when learning. Note that MaskablePPO does not accept
     # a new action_mask_fn kwarg, as it did in an earlier draft.
-    model = MaskablePPO(MaskableActorCriticPolicy, env, verbose=1)
+    model = MaskablePPO(MaskableActorCriticPolicy, env, verbose=1, device = 'cuda',learning_rate=0.001, ent_coef=0.005)
     model.set_random_seed(seed)
     model.learn(total_timesteps=steps)
 
@@ -93,7 +94,7 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
     env = env_fn.env(render_mode=render_mode, **env_kwargs)
 
     print(
-        f"Starting evaluation vs a random agent. Trained agent will play as {env.possible_agents[1]}."
+        f"Starting evaluation vs a random agent. Trained agent will play as {env.possible_agents[0]}."
     )
 
     try:
@@ -112,7 +113,7 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
 
     for i in range(num_games):
         env.reset(seed=i)
-        env.action_space(env.possible_agents[0]).seed(i)
+        env.action_space(env.possible_agents[1]).seed(i)
 
         for agent in env.agent_iter():
             obs, reward, termination, truncation, info = env.last()
@@ -158,6 +159,14 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
     print("Total rewards (incl. negative rewards): ", total_rewards)
     print("Winrate: ", winrate)
     print("Final scores: ", scores)
+
+    with open("Player2.txt", "a") as f:
+        f.write("Part 3\n")
+        f.write("Rewards by round: ", round_rewards, "\n")
+        f.write("Total rewards (incl. negative rewards): ", total_rewards, "\n")
+        f.write("Winrate: ", winrate, "\n")
+        f.write("Final scores: ", scores, "\n")
+
     return round_rewards, total_rewards, winrate, scores
 
 
@@ -168,12 +177,25 @@ if __name__ == "__main__":
 
     # Train a model against itself
     print("Training model against itself")
-    train_action_mask(env_fn, steps=1, seed=0, **env_kwargs)
+    train_action_mask(env_fn, steps=100000, seed=0, **env_kwargs)
 
-    # Evaluate 100 games against a random agent (winrate should be ~80%)
+    # Evaluate 100 games against a random agent
     print("Training model against random ")
-    eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs)
+    eval_action_mask(env_fn, num_games=1000, render_mode=None, **env_kwargs)
 
-    # Watch two games vs a random agent
-    print("Watching model against random")
-    eval_action_mask(env_fn, num_games=2, render_mode="human", **env_kwargs)
+    # # Watch two games vs a random agent
+    # print("Watching model against random")
+    # eval_action_mask(env_fn, num_games=500, render_mode="human", **env_kwargs)
+    
+
+
+"""
+When agent is player 1: 
+Part 3
+Total rewards (incl. negative rewards):  {0: 344, 1: -344}
+Winrate:  0.9343434343434344
+Final scores:  {0: 370, 1: 26}
+
+When agent is player 2: 
+Part 3
+"""

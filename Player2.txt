@@ -1,0 +1,449 @@
+Training model against itself
+Starting training on BlokusDuo.
+C:\Users\etashj\AppData\Local\Programs\Python\Python39\lib\site-packages\pettingzoo\utils\env.py:120: UserWarning: Your environment should override the observation_space function. Attempting to use the observation_spaces dict attribute.
+  warnings.warn(
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+C:\Users\etashj\AppData\Local\Programs\Python\Python39\lib\site-packages\stable_baselines3\common\vec_env\base_vec_env.py:77: UserWarning: The `render_mode` attribute is not defined in your environment. It will be set to None.
+  warnings.warn("The `render_mode` attribute is not defined in your environment. It will be set to None.")
+C:\Users\etashj\AppData\Local\Programs\Python\Python39\lib\site-packages\pettingzoo\utils\env.py:120: UserWarning: Your environment should override the observation_space function. Attempting to use the observation_spaces dict attribute.
+  warnings.warn(
+INVALID MOVE SELECTED (13, 6, 1, 4)
+INVALID MOVE SELECTED (12, 6, 6, 5)
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 25       |
+|    ep_rew_mean     | 0.146    |
+| time/              |          |
+|    fps             | 17       |
+|    iterations      | 1        |
+|    time_elapsed    | 119      |
+|    total_timesteps | 2048     |
+---------------------------------
+INVALID MOVE SELECTED (4, 1, 20, 4)
+INVALID MOVE SELECTED (12, 3, 16, 6)
+INVALID MOVE SELECTED (4, 1, 13, 4)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 24.9       |
+|    ep_rew_mean          | 0.36       |
+| time/                   |            |
+|    fps                  | 15         |
+|    iterations           | 2          |
+|    time_elapsed         | 260        |
+|    total_timesteps      | 4096       |
+| train/                  |            |
+|    approx_kl            | 0.08082327 |
+|    clip_fraction        | 0.794      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.69      |
+|    explained_variance   | -0.146     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.167     |
+|    n_updates            | 10         |
+|    policy_gradient_loss | -0.135     |
+|    value_loss           | 0.0486     |
+----------------------------------------
+INVALID MOVE SELECTED (5, 12, 0, 1)
+INVALID MOVE SELECTED (0, 1, 12, 2)
+INVALID MOVE SELECTED (7, 6, 11, 0)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.3       |
+|    ep_rew_mean          | 0.37       |
+| time/                   |            |
+|    fps                  | 15         |
+|    iterations           | 3          |
+|    time_elapsed         | 402        |
+|    total_timesteps      | 6144       |
+| train/                  |            |
+|    approx_kl            | 0.15394932 |
+|    clip_fraction        | 0.831      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.63      |
+|    explained_variance   | -0.202     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.162     |
+|    n_updates            | 20         |
+|    policy_gradient_loss | -0.129     |
+|    value_loss           | 0.034      |
+----------------------------------------
+INVALID MOVE SELECTED (13, 9, 5, 4)
+INVALID MOVE SELECTED (2, 10, 11, 7)
+INVALID MOVE SELECTED (7, 9, 16, 0)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 24.9       |
+|    ep_rew_mean          | 0.16       |
+| time/                   |            |
+|    fps                  | 15         |
+|    iterations           | 4          |
+|    time_elapsed         | 545        |
+|    total_timesteps      | 8192       |
+| train/                  |            |
+|    approx_kl            | 0.20220156 |
+|    clip_fraction        | 0.83       |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.58      |
+|    explained_variance   | -0.0968    |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.166     |
+|    n_updates            | 30         |
+|    policy_gradient_loss | -0.128     |
+|    value_loss           | 0.0305     |
+----------------------------------------
+INVALID MOVE SELECTED (1, 7, 1, 4)
+INVALID MOVE SELECTED (7, 8, 17, 6)
+INVALID MOVE SELECTED (9, 11, 19, 7)
+INVALID MOVE SELECTED (13, 11, 5, 5)
+INVALID MOVE SELECTED (0, 10, 20, 1)
+INVALID MOVE SELECTED (1, 11, 0, 0)
+---------------------------------------
+| rollout/                |           |
+|    ep_len_mean          | 25.2      |
+|    ep_rew_mean          | 0.15      |
+| time/                   |           |
+|    fps                  | 14        |
+|    iterations           | 5         |
+|    time_elapsed         | 685       |
+|    total_timesteps      | 10240     |
+| train/                  |           |
+|    approx_kl            | 0.2370031 |
+|    clip_fraction        | 0.846     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.61     |
+|    explained_variance   | -0.292    |
+|    learning_rate        | 0.001     |
+|    loss                 | -0.175    |
+|    n_updates            | 40        |
+|    policy_gradient_loss | -0.135    |
+|    value_loss           | 0.0383    |
+---------------------------------------
+INVALID MOVE SELECTED (6, 12, 16, 0)
+INVALID MOVE SELECTED (13, 11, 8, 1)
+INVALID MOVE SELECTED (7, 2, 17, 5)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.2       |
+|    ep_rew_mean          | 0.11       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 6          |
+|    time_elapsed         | 826        |
+|    total_timesteps      | 12288      |
+| train/                  |            |
+|    approx_kl            | 0.26827595 |
+|    clip_fraction        | 0.845      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.51      |
+|    explained_variance   | -0.0137    |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.166     |
+|    n_updates            | 50         |
+|    policy_gradient_loss | -0.133     |
+|    value_loss           | 0.0346     |
+----------------------------------------
+INVALID MOVE SELECTED (1, 2, 20, 0)
+INVALID MOVE SELECTED (0, 10, 8, 0)
+INVALID MOVE SELECTED (3, 2, 7, 3)
+INVALID MOVE SELECTED (1, 11, 0, 7)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 24.6       |
+|    ep_rew_mean          | 0.38       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 7          |
+|    time_elapsed         | 968        |
+|    total_timesteps      | 14336      |
+| train/                  |            |
+|    approx_kl            | 0.31186232 |
+|    clip_fraction        | 0.841      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.52      |
+|    explained_variance   | -0.258     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.167     |
+|    n_updates            | 60         |
+|    policy_gradient_loss | -0.13      |
+|    value_loss           | 0.0373     |
+----------------------------------------
+INVALID MOVE SELECTED (3, 10, 16, 0)
+INVALID MOVE SELECTED (7, 8, 16, 3)
+INVALID MOVE SELECTED (4, 4, 15, 1)
+---------------------------------------
+| rollout/                |           |
+|    ep_len_mean          | 24.6      |
+|    ep_rew_mean          | 0.43      |
+| time/                   |           |
+|    fps                  | 14        |
+|    iterations           | 8         |
+|    time_elapsed         | 1107      |
+|    total_timesteps      | 16384     |
+| train/                  |           |
+|    approx_kl            | 0.2834384 |
+|    clip_fraction        | 0.842     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.54     |
+|    explained_variance   | -0.0365   |
+|    learning_rate        | 0.001     |
+|    loss                 | -0.154    |
+|    n_updates            | 70        |
+|    policy_gradient_loss | -0.128    |
+|    value_loss           | 0.0387    |
+---------------------------------------
+INVALID MOVE SELECTED (5, 2, 15, 4)
+INVALID MOVE SELECTED (12, 5, 17, 4)
+INVALID MOVE SELECTED (8, 10, 13, 6)
+--------------------------------------
+| rollout/                |          |
+|    ep_len_mean          | 25       |
+|    ep_rew_mean          | 0.3      |
+| time/                   |          |
+|    fps                  | 14       |
+|    iterations           | 9        |
+|    time_elapsed         | 1237     |
+|    total_timesteps      | 18432    |
+| train/                  |          |
+|    approx_kl            | 0.320803 |
+|    clip_fraction        | 0.85     |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -4.49    |
+|    explained_variance   | 0.0199   |
+|    learning_rate        | 0.001    |
+|    loss                 | -0.168   |
+|    n_updates            | 80       |
+|    policy_gradient_loss | -0.129   |
+|    value_loss           | 0.032    |
+--------------------------------------
+INVALID MOVE SELECTED (6, 3, 18, 5)
+INVALID MOVE SELECTED (6, 2, 10, 3)
+INVALID MOVE SELECTED (11, 8, 1, 7)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.4       |
+|    ep_rew_mean          | 0.21       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 10         |
+|    time_elapsed         | 1385       |
+|    total_timesteps      | 20480      |
+| train/                  |            |
+|    approx_kl            | 0.33895722 |
+|    clip_fraction        | 0.849      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.42      |
+|    explained_variance   | -0.016     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.17      |
+|    n_updates            | 90         |
+|    policy_gradient_loss | -0.133     |
+|    value_loss           | 0.038      |
+----------------------------------------
+INVALID MOVE SELECTED (9, 1, 19, 6)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 26.1       |
+|    ep_rew_mean          | 0.26       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 11         |
+|    time_elapsed         | 1526       |
+|    total_timesteps      | 22528      |
+| train/                  |            |
+|    approx_kl            | 0.37414834 |
+|    clip_fraction        | 0.849      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.38      |
+|    explained_variance   | -0.172     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.172     |
+|    n_updates            | 100        |
+|    policy_gradient_loss | -0.133     |
+|    value_loss           | 0.039      |
+----------------------------------------
+INVALID MOVE SELECTED (5, 11, 18, 1)
+INVALID MOVE SELECTED (4, 13, 13, 1)
+INVALID MOVE SELECTED (9, 3, 20, 2)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.3       |
+|    ep_rew_mean          | 0.38       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 12         |
+|    time_elapsed         | 1668       |
+|    total_timesteps      | 24576      |
+| train/                  |            |
+|    approx_kl            | 0.37870088 |
+|    clip_fraction        | 0.843      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.29      |
+|    explained_variance   | 0.0238     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.176     |
+|    n_updates            | 110        |
+|    policy_gradient_loss | -0.13      |
+|    value_loss           | 0.0323     |
+----------------------------------------
+INVALID MOVE SELECTED (7, 0, 0, 6)
+INVALID MOVE SELECTED (12, 2, 19, 1)
+INVALID MOVE SELECTED (11, 4, 3, 2)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.3       |
+|    ep_rew_mean          | 0.25       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 13         |
+|    time_elapsed         | 1810       |
+|    total_timesteps      | 26624      |
+| train/                  |            |
+|    approx_kl            | 0.34668615 |
+|    clip_fraction        | 0.841      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.33      |
+|    explained_variance   | -0.00536   |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.17      |
+|    n_updates            | 120        |
+|    policy_gradient_loss | -0.129     |
+|    value_loss           | 0.0374     |
+----------------------------------------
+INVALID MOVE SELECTED (1, 7, 19, 6)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.2       |
+|    ep_rew_mean          | 0.47       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 14         |
+|    time_elapsed         | 1953       |
+|    total_timesteps      | 28672      |
+| train/                  |            |
+|    approx_kl            | 0.37355673 |
+|    clip_fraction        | 0.847      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.32      |
+|    explained_variance   | -0.0586    |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.167     |
+|    n_updates            | 130        |
+|    policy_gradient_loss | -0.131     |
+|    value_loss           | 0.0356     |
+----------------------------------------
+INVALID MOVE SELECTED (8, 5, 2, 3)
+INVALID MOVE SELECTED (8, 0, 8, 3)
+---------------------------------------
+| rollout/                |           |
+|    ep_len_mean          | 25.3      |
+|    ep_rew_mean          | 0.32      |
+| time/                   |           |
+|    fps                  | 14        |
+|    iterations           | 15        |
+|    time_elapsed         | 2095      |
+|    total_timesteps      | 30720     |
+| train/                  |           |
+|    approx_kl            | 0.3555813 |
+|    clip_fraction        | 0.825     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.25     |
+|    explained_variance   | 0.0998    |
+|    learning_rate        | 0.001     |
+|    loss                 | -0.13     |
+|    n_updates            | 140       |
+|    policy_gradient_loss | -0.122    |
+|    value_loss           | 0.0297    |
+---------------------------------------
+INVALID MOVE SELECTED (6, 9, 5, 3)
+INVALID MOVE SELECTED (7, 0, 3, 4)
+---------------------------------------
+| rollout/                |           |
+|    ep_len_mean          | 25.1      |
+|    ep_rew_mean          | 0.37      |
+| time/                   |           |
+|    fps                  | 14        |
+|    iterations           | 16        |
+|    time_elapsed         | 2237      |
+|    total_timesteps      | 32768     |
+| train/                  |           |
+|    approx_kl            | 0.4046153 |
+|    clip_fraction        | 0.839     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.18     |
+|    explained_variance   | -0.0963   |
+|    learning_rate        | 0.001     |
+|    loss                 | -0.169    |
+|    n_updates            | 150       |
+|    policy_gradient_loss | -0.127    |
+|    value_loss           | 0.0295    |
+---------------------------------------
+INVALID MOVE SELECTED (13, 5, 13, 0)
+INVALID MOVE SELECTED (5, 3, 6, 5)
+INVALID MOVE SELECTED (3, 8, 11, 7)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.1       |
+|    ep_rew_mean          | 0.5        |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 17         |
+|    time_elapsed         | 2375       |
+|    total_timesteps      | 34816      |
+| train/                  |            |
+|    approx_kl            | 0.39185768 |
+|    clip_fraction        | 0.832      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.18      |
+|    explained_variance   | 0.015      |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.173     |
+|    n_updates            | 160        |
+|    policy_gradient_loss | -0.126     |
+|    value_loss           | 0.0339     |
+----------------------------------------
+---------------------------------------
+| rollout/                |           |
+|    ep_len_mean          | 25        |
+|    ep_rew_mean          | 0.41      |
+| time/                   |           |
+|    fps                  | 14        |
+|    iterations           | 18        |
+|    time_elapsed         | 2516      |
+|    total_timesteps      | 36864     |
+| train/                  |           |
+|    approx_kl            | 0.3896048 |
+|    clip_fraction        | 0.827     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.19     |
+|    explained_variance   | 0.0358    |
+|    learning_rate        | 0.001     |
+|    loss                 | -0.156    |
+|    n_updates            | 170       |
+|    policy_gradient_loss | -0.123    |
+|    value_loss           | 0.0317    |
+---------------------------------------
+INVALID MOVE SELECTED (10, 11, 15, 7)
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 25.1       |
+|    ep_rew_mean          | 0.47       |
+| time/                   |            |
+|    fps                  | 14         |
+|    iterations           | 19         |
+|    time_elapsed         | 2658       |
+|    total_timesteps      | 38912      |
+| train/                  |            |
+|    approx_kl            | 0.40997127 |
+|    clip_fraction        | 0.825      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.13      |
+|    explained_variance   | 0.0997     |
+|    learning_rate        | 0.001      |
+|    loss                 | -0.145     |
+|    n_updates            | 180        |
+|    policy_gradient_loss | -0.125     |
+|    value_loss           | 0.0349     |
+----------------------------------------
+INVALID MOVE SELECTED (0, 13, 8, 3)

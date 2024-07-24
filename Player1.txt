@@ -1,0 +1,4 @@
+Part 3
+Total rewards (incl. negative rewards):  {0: 344, 1: -344}
+Winrate:  0.9343434343434344
+Final scores:  {0: 370, 1: 26}
