@@ -147,10 +147,12 @@ class BlokusEnv(AECEnv):
                 valid1Found = True
                 break
         if not valid1Found:
-            # Should never be called
-            self.board.randomTurn(None, None)
-            # self.rewards[current_agent] = -50
-            print("INVALID MOVE SELECTED", actionArr)
+            if self.board.calculateLegalMoves() != []:
+                self.render()
+                print(self.board.calculateLegalMoves())
+                # Should never be called
+                self.board.randomTurn(None, None)
+                print("INVALID MOVE SELECTED", actionArr)
         if self.board.calculateLegalMoves()==[]:
             self.terminations[current_agent] = True
 
@@ -172,13 +174,13 @@ class BlokusEnv(AECEnv):
                 self.rewards[0] += 1
                 self.rewards[1] -= 1
                 self.wins[0] += 1
-                # print("Player 1 wins")
+                print("Player 1 wins")
             elif self.board.score[0] < self.board.score[1]:
                 self.rewards[0] -= 1
                 self.rewards[1] += 1
                 self.wins[1] += 1
-                # print("Player 2 wins")
-            # self.render()
+                print("Player 2 wins")
+            
             # print()
             self.done = True
             # self.reset()
