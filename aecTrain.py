@@ -16,7 +16,7 @@ from sb3_contrib.common.maskable.policies import MaskableActorCriticPolicy
 from sb3_contrib.common.wrappers import ActionMasker
 
 import pettingzoo.utils
-from blokusEnv import BlokusEnv
+from blokusEnv import BlokusEnv, discreteToAction
 
 
 class SB3ActionMaskWrapper(pettingzoo.utils.BaseWrapper):
@@ -60,7 +60,7 @@ def mask_fn(env):
     return env.genActionMask()
 
 
-def train_action_mask(env_fn, steps=10_000, seed=0, **env_kwargs):
+def train_action_mask(env_fn, i, steps=10_000, seed=0, **env_kwargs):
     """Train a single model to play as each agent in a zero-sum game environment using invalid action masking."""
     env = env_fn.env(**env_kwargs)
 
@@ -77,10 +77,14 @@ def train_action_mask(env_fn, steps=10_000, seed=0, **env_kwargs):
     # retrieved and used when learning. Note that MaskablePPO does not accept
     # a new action_mask_fn kwarg, as it did in an earlier draft.
     model = MaskablePPO(MaskableActorCriticPolicy, env, verbose=1, device = 'cuda',learning_rate=0.001, ent_coef=0.005)
+    if (i>0): 
+        model = model.load(f"final_models/final_model_{i-1}.zip")
+        model.set_env(env)
     model.set_random_seed(seed)
     model.learn(total_timesteps=steps)
 
-    model.save(f"{env.unwrapped.metadata.get('name')}_{time.strftime('%Y%m%d-%H%M%S')}")
+    # model.save(f"{env.unwrapped.metadata.get('name')}_{time.strftime('%Y%m%d-%H%M%S')}")
+    model.save(f"final_models/final_model_{i}.zip")
 
     print("Model has been saved.")
 
@@ -89,21 +93,22 @@ def train_action_mask(env_fn, steps=10_000, seed=0, **env_kwargs):
     env.close()
 
 
-def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
+def eval_action_mask(env_fn, id, num_games=100, render_mode=None, **env_kwargs):
     # Evaluate a trained agent vs a random agent
     env = env_fn.env(render_mode=render_mode, **env_kwargs)
 
     print(
-        f"Starting evaluation vs a random agent. Trained agent will play as {env.possible_agents[0]}."
+        f"Starting evaluation vs a random agent. Trained agent will play as {env.possible_agents[1]}."
     )
 
-    try:
-        latest_policy = max(
-            glob.glob(f"{env.metadata['name']}*.zip"), key=os.path.getctime
-        )
-    except ValueError:
-        print("Policy not found.")
-        exit(0)
+    # try:
+    #     latest_policy = max(
+    #         glob.glob(f"{env.metadata['name']}*.zip"), key=os.path.getctime
+    #     )
+    # except ValueError:
+    #     print("Policy not found.")
+    #     exit(0)
+    latest_policy = f"final_models/final_model_{i}.zip"
 
     model = MaskablePPO.load(latest_policy)
 
@@ -113,7 +118,7 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
 
     for i in range(num_games):
         env.reset(seed=i)
-        env.action_space(env.possible_agents[1]).seed(i)
+        env.action_space(env.possible_agents[0]).seed(id)
 
         for agent in env.agent_iter():
             obs, reward, termination, truncation, info = env.last()
@@ -138,7 +143,7 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
                 round_rewards.append(env.rewards)
                 break
             else:
-                if agent == env.possible_agents[0]:
+                if agent == env.possible_agents[1]:
                     act = env.action_space(agent).sample(action_mask)
                 else:
                     # Note: PettingZoo expects integer actions # TODO: change chess to cast actions to type int?
@@ -147,6 +152,7 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
                             observation, action_masks=action_mask, deterministic=True
                         )[0]
                     )
+                # env.render()
             env.step(act)
     env.close()
 
@@ -154,18 +160,18 @@ def eval_action_mask(env_fn, num_games=100, render_mode=None, **env_kwargs):
     if sum(scores.values()) == 0:
         winrate = 0
     else:
-        winrate = scores[env.possible_agents[1]] / sum(scores.values())
+        winrate = scores[env.possible_agents[0]] / sum(scores.values())
     print("Rewards by round: ", round_rewards)
     print("Total rewards (incl. negative rewards): ", total_rewards)
     print("Winrate: ", winrate)
     print("Final scores: ", scores)
 
-    with open("Player2.txt", "a") as f:
-        f.write("Part 3\n")
-        f.write("Rewards by round: ", round_rewards, "\n")
-        f.write("Total rewards (incl. negative rewards): ", total_rewards, "\n")
-        f.write("Winrate: ", winrate, "\n")
-        f.write("Final scores: ", scores, "\n")
+    with open("final.txt", "a") as f:
+        f.write(f"Part {id}\n")
+        # f.write("Rewards by round: " + '\n' + round_rewards + "\n")
+        f.write("Total rewards (incl. negative rewards): " + str(total_rewards) + "\n")
+        f.write("Winrate: " + str(winrate) + "\n")
+        f.write("Final scores: " + str(scores) + "\n")
 
     return round_rewards, total_rewards, winrate, scores
 
@@ -175,13 +181,14 @@ if __name__ == "__main__":
 
     env_kwargs = {}
 
-    # Train a model against itself
-    print("Training model against itself")
-    train_action_mask(env_fn, steps=100000, seed=0, **env_kwargs)
+    for i in range (10): 
+        # Train a model against itself
+        print("Training model against itself")
+        train_action_mask(env_fn, i, steps=10_000, seed=i, **env_kwargs)
 
-    # Evaluate 100 games against a random agent
-    print("Training model against random ")
-    eval_action_mask(env_fn, num_games=1000, render_mode=None, **env_kwargs)
+        # Evaluate 100 games against a random agent
+        print("Training model against random ")
+        eval_action_mask(env_fn, i, num_games=250, render_mode=None, **env_kwargs)
 
     # # Watch two games vs a random agent
     # print("Watching model against random")
