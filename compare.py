@@ -7,7 +7,7 @@ from sb3_contrib import MaskablePPO
 from sb3_contrib.common.maskable.policies import MaskableActorCriticPolicy
 from sb3_contrib.common.wrappers import ActionMasker
 
-import tensorflow as tf
+# import tensorflow as tf
 
 from board import Board
 from blokusEnv import BlokusEnv, actionToDiscrete, discreteToAction
@@ -19,6 +19,7 @@ class RANDOM():
 @dataclass
 class MINIMAX():
     weights: list
+    level: int
 
 @dataclass
 class MCTS():
@@ -64,25 +65,29 @@ def randWeights():
 # PPO(MaskablePPO.load('BlokusDuo_20240724-142902.zip'), BlokusEnv.env())
 
 # Set players
-PLAYER_1 = PPO(MaskablePPO.load('BlokusDuo_20240724-142902.zip'), BlokusEnv.env())
-PLAYER_2 = MCTS(randWeights(), 100)
-NUM_SIMULATIONS = 5
+# PLAYER_1 = PPO(MaskablePPO.load('BlokusDuo_20240724-142902.zip'), BlokusEnv.env())
+# PLAYER_2 = MCTS(randWeights(), 100)
+NUM_SIMULATIONS = 25
 
 PRINT_BOARD = False
-
-
-
+weights = [5,1,1,4,1,1,15,15,3,0,0,0]
+algorithms = [
+    RANDOM(),
+    MINIMAX(weights, 1),
+    MCTS(weights, 500),
+    PPO(MaskablePPO.load('BlokusDuo_20240724-140211.zip'), BlokusEnv.env())
+]
 
 def getMove(board: Board, player, playerOrder, i):
     pt = type(player)
     if pt == RANDOM:
         return board.randomTurn(place=False)
     elif pt == MINIMAX:
-        return board.playSmart(0, player.weights, place=False)
+        return board.playSmart_v2(player.level, player.weights, place=False)
     elif pt == MCTS:
-        return board.monte_carlo_turn(player.weights, 1, num_sims=player.num_sims, value_net=None, place=False)
+        return board.monte_carlo_turn(player.weights, playerOrder + 1, num_sims=player.num_sims, value_net=None, place=False)
     elif pt == MCTSNN:
-        return board.monte_carlo_turn(player.weights, 1, num_sims=player.num_sims, value_net=None, place=False)
+        return board.monte_carlo_turn(player.weights, playerOrder + 1, num_sims=player.num_sims, value_net=None, place=False)
     elif pt == PPO:
         env = player.env
 
@@ -99,24 +104,41 @@ def getMove(board: Board, player, playerOrder, i):
         
     return None
 
+PLAYER_1 = algorithms[0]
+for PLAYER_2 in algorithms:
+    wins = [0, 0]
+    scores = [0, 0]
 
-for i in range(NUM_SIMULATIONS):
-    board = Board(14)
+    for i in range(NUM_SIMULATIONS):
+        board = Board(14)
 
-    while board.running:
-        if board.finished == [True, True]:
-            board.displayStateOfGame()
-            if PRINT_BOARD:
-                print(board)
-            break
+        while board.running:
+            if board.finished == [True, True]:
+                # board.displayStateOfGame()
+                if board.score[0] > board.score[1]:
+                    wins[0] += 1
+                elif board.score[0] < board.score[1]:
+                    wins[1] += 1
+                
+                scores[0] += board.score[0]
+                scores[1] += board.score[1]
 
-        if board.finished[board.turn - 1] or board.calculateLegalMoves() == []:
-            board.finished[board.turn - 1] = True
-            board.switchPlayer()
-        else:
-            if board.state == 'p1_turn':
-                move = getMove(board, PLAYER_1, 0, i)
-            elif board.state == 'p2_turn':
-                move = getMove(board, PLAYER_2, 1, i)
-            board.place_piece(move)
-            board.switchPlayer()
+                if PRINT_BOARD:
+                    print(board)
+                break
+
+            if board.finished[board.turn - 1] or board.calculateLegalMoves() == []:
+                board.finished[board.turn - 1] = True
+                board.switchPlayer()
+            else:
+                if board.state == 'p1_turn':
+                    move = getMove(board, PLAYER_1, 0, i)
+                elif board.state == 'p2_turn':
+                    move = getMove(board, PLAYER_2, 1, i)
+                board.place_piece(move)
+                board.switchPlayer()
+        
+    print(f'{type(PLAYER_1)} and {type(PLAYER_2)} results:')
+    print(f'P1 won {wins[0]} averaging {scores[0] / NUM_SIMULATIONS}')
+    print(f'P2 won {wins[1]} averaging {scores[1] / NUM_SIMULATIONS}')
+    print()

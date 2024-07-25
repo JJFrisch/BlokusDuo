@@ -485,14 +485,14 @@ class Board:
         # else:
         moves = board.calculateLegalMoves(only_fives_rounds=weights[9])
 
-        print(len(moves), len(moves)**level, ": moves, possibilities")
+        # print(len(moves), len(moves)**level, ": moves, possibilities")
         i = 1
         if isMaximizingPlayer:
             val = -math.inf
             best_move = []
             for move in moves:
-                if i % 100 == 0:
-                    print(i)
+                # if i % 100 == 0:
+                #     print(i)
                 new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val > val:
                     val = new_val
@@ -503,8 +503,8 @@ class Board:
             val = math.inf
             best_move = []
             for move in moves:
-                if i % 100 == 0:
-                    print(i)
+                # if i % 100 == 0:
+                #     print(i)
                 new_val = board.max_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val < val:
                     val = new_val
@@ -515,7 +515,7 @@ class Board:
         return best_move
 
 
-    def playSmart_v2(self, level, weights):
+    def playSmart_v2(self, level, weights, place=True):
         tempBoard = copy.deepcopy(self)
         # print(level)
         if level % 2 == 0:
@@ -524,7 +524,7 @@ class Board:
             move = self.minimax_v2(tempBoard, level, False, weights)
         # print(move)
 
-
+        if not place: return move
         if move == []:
             self.finished[self.turn-1] = True
         else:
@@ -751,7 +751,7 @@ class Board:
                     to_pred = to_pred[np.newaxis, :, :, np.newaxis]
                     value = -value_net.predict(to_pred, verbose=0)
                     score = -board.calculate_board_score_mcts(board, weights)
-                    score = (value + 2*score) / 3
+                    score = (value + 4*score) / 5
                 return score
             else:
                 # print(board.score, player, 'score and turn 2')
