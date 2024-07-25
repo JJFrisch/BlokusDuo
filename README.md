@@ -1,6 +1,6 @@
 # BlokusDuo
 An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through gameplay optimization using Minimax algorithms.
-### By Alden Bressler, Delia Brown, Jake Frischmann, Micheal Huang, Etash Jhanji, and Sebastian Liu
+### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 The names and original orientations
 [here](pieces_numbered.png)
