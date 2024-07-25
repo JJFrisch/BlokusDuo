@@ -298,3 +298,23 @@ P2 won 5 averaging 62.0
 P1 won 0 averaging 52.0
 P2 won 5 averaging 59.0
 
+<class '__main__.MCTS'> and <class '__main__.PPO'> results:
+P1 won 5 averaging 65.6
+P2 won 0 averaging 53.2
+
+<class '__main__.PPO'> and <class '__main__.RANDOM'> results:
+P1 won 5 averaging 64.2
+P2 won 0 averaging 49.8
+
+<class '__main__.PPO'> and <class '__main__.MINIMAX'> results:
+P1 won 5 averaging 72.0
+P2 won 0 averaging 62.0
+
+<class '__main__.PPO'> and <class '__main__.MCTS'> results:
+P1 won 1 averaging 50.0
+P2 won 4 averaging 61.2
+
+<class '__main__.PPO'> and <class '__main__.PPO'> results:
+P1 won 0 averaging 52.0
+P2 won 5 averaging 59.0
+

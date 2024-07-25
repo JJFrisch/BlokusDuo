@@ -70,14 +70,14 @@ def randWeights():
 # Set players
 # PLAYER_1 = PPO(MaskablePPO.load('BlokusDuo_20240724-142902.zip'), BlokusEnv.env())
 # PLAYER_2 = MCTS(randWeights(), 100)
-NUM_SIMULATIONS = 5
+NUM_SIMULATIONS = 10
 
 PRINT_BOARD = False
 weights = [57,1,1,7,1,1,15,15,15,0,0,0]
 algorithms = [
     RANDOM(),
-    MINIMAX(weights, 1),
-    MCTS(weights, 500),
+    MINIMAX(weights, 2),
+    MCTS(weights, 2000),
     PPO(MaskablePPO.load('BlokusDuo_20240724-140211.zip'), BlokusEnv.env())
 ]
 
@@ -143,5 +143,5 @@ for PLAYER_1 in algorithms:
         
         txt = [f'{type(PLAYER_1)} and {type(PLAYER_2)} results:\n', f'P1 won {wins[0]} averaging {scores[0] / NUM_SIMULATIONS}\n',
                f'P2 won {wins[1]} averaging {scores[1] / NUM_SIMULATIONS}\n\n']
-        with open('comparison.txt', 'a') as f:
+        with open('comparison2.txt', 'a') as f:
             f.writelines(txt)
