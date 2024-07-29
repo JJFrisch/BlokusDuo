@@ -3,8 +3,16 @@ from board import Board
 import math, random, time
 from csv import writer
 import time
+#408
 
-number_of_simulations = 2     
+data = [
+    ['Player_Type','Player_Levels','Opponent_Type','Opponent_Levels','Player_Score','Opponent_Score','Score_Differential','Player_Pieces_Left','Opponent Pieces Left','# rounds','w1 - score per opp dot','w2 - opp dot dist from player start','w3 - score per opp dot open corners #','w4 - score per player dot','w5 - player dot dist from opp start','w6 - score per player dot open corners #','w7 - player score multiplier','w8 - opponent score multiplier','w9 - piece difficulty weight','only 5s rounds','rounds choosing only difficult pieces','# of difficult pieces included','time taken']
+]
+ 
+# File path for the CSV file
+csv_file_path = 'BlokusDuo-main/game_data.csv'
+
+number_of_simulations = 2000000
 PRINT_BOARD = False
 # pieces = generatePiecesDict(pieces) 
 
@@ -29,14 +37,14 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  player_types = [board.playSmart_v2, board.randomTurn, board.playSmart]
+  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
         board.randomTurn : 'randomTurn',
       }
 
-  player_type = random.choice(player_types)
+  player_type = random.choices(player_types, weights=(5, 35, 60), k=1)[0]
   num_levels = random.randint(0,4)
   min_moves = 1000
   player_levels = []
@@ -58,8 +66,7 @@ for i in range(number_of_simulations):
   
   p1_weights = randWeights()
   p2_weights = randWeights()
-  # player_levels = [[0,1]]
-  # opp_levels = [[0,1]]
+
 
   print("Player 1:", convert_func_names[player_type], player_levels)
   print("Player 2:", convert_func_names[opp_type], opp_levels)
@@ -103,9 +110,9 @@ for i in range(number_of_simulations):
       if convert_func_names[player_type] == 'randomTurn':
         player_levels = 0
       if convert_func_names[opp_type] == 'playSmart_v1' :
-        player_levels = [0,1]
+        opp_levels = [0,1]
       if convert_func_names[opp_type] == 'randomTurn':
-        player_levels = 0
+        opp_levels = 0
       # List that we want to add as a new row
       # Player Type	Player Levels ex. poss_moves = i. if i > 400: depth =1, i>100: depth=2, i>0:depth=3	Opponent Type	Opponent Levels	Player Score	Opponent Score	Score Differential	Player Pieces Left	Opponent Pieces Left	# rounds	w1 - score per opp dot	w2 - opp dot dist from player start	w3 - score per opp dot open corners #	w4 - score per player dot	w5 - player dot dist from opp start	w6 - score per player dot open corners #	w7 - player score multiplier	w8 - opponent score multiplier	w9 - piece difficulty weight	only 5's rounds	rounds choosing only difficult peices	# of difficult pieces included	
       p1_list = [convert_func_names[player_type], player_levels, convert_func_names[opp_type], opp_levels, board.score[0], board.score[1], board.score[0]-board.score[1], board.inv[0], board.inv[1], board.turn_count, ]
@@ -119,7 +126,7 @@ for i in range(number_of_simulations):
         
       # Open our existing CSV file in append mode
       # Create a file object for this file
-      with open('game_data.csv', 'a') as f_object:
+      with open(csv_file_path, 'a') as f_object:
       
           # Pass this file object to csv.writer()
           # and get a writer object

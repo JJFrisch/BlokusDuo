@@ -480,10 +480,6 @@ class Board:
             return 
 
         # will only look at the hard to place 5 peices as options for the first 2 turns
-        # if board.turn_count <= weights[10]:
-        #     moves = board.calculateLegalMovesEarly(weights[11], only_fives_rounds=weights[9])
-        # else:
-        moves = board.calculateLegalMoves(only_fives_rounds=weights[9])
 
         # print(len(moves), len(moves)**level, ": moves, possibilities")
         i = 1
@@ -491,8 +487,8 @@ class Board:
             val = -math.inf
             best_move = []
             for move in moves:
-                # if i % 100 == 0:
-                #     print(i)
+                if i % 100 == 0:
+                    print(i)
                 new_val = board.min_value(board.result(board, move), level-1, -math.inf, math.inf, weights)
                 if new_val > val:
                     val = new_val

@@ -1,8 +1,9 @@
 # BlokusDuo
-### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji, Micheal Huang
+An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through gameplay optimization using Minimax algorithms.
+### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 The names and original orientations
-![image](pieces.png)
+[here](pieces_numbered.png)
 
  
 The reference sheet for the names, point count, corners and orientations of the blocks.
@@ -17,4 +18,4 @@ https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUD
 ### Blokus Statistical Data spreadsheet
 https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
 
-`aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower). 
+`aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower).
