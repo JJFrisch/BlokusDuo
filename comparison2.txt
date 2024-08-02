@@ -1,0 +1,256 @@
+<class '__main__.RANDOM'> and <class '__main__.RANDOM'> results:
+P1 won 7 averaging 56.4
+P2 won 3 averaging 51.3
+
+<class '__main__.RANDOM'> and <class '__main__.RANDOM'> results:
+P1 won 6 averaging 56.8
+P2 won 3 averaging 53.4
+
+<class '__main__.RANDOM'> and <class '__main__.RANDOM'> results:
+P1 won 3 averaging 51.3
+P2 won 7 averaging 54.7
+
+<class '__main__.RANDOM'> and <class '__main__.RANDOM'> results:
+P1 won 7 averaging 55.2
+P2 won 3 averaging 52.9
+
+<class '__main__.RANDOM'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 44.7
+P2 won 10 averaging 63.0
+
+<class '__main__.RANDOM'> and <class '__main__.MINIMAX'> results:
+P1 won 2 averaging 48.1
+P2 won 8 averaging 62.4
+
+<class '__main__.RANDOM'> and <class '__main__.MINIMAX'> results:
+P1 won 1 averaging 43.2
+P2 won 9 averaging 61.4
+
+<class '__main__.RANDOM'> and <class '__main__.MINIMAX'> results:
+P1 won 1 averaging 44.3
+P2 won 9 averaging 61.8
+
+<class '__main__.RANDOM'> and <class '__main__.MCTS'> results:
+P1 won 2 averaging 48.0
+P2 won 8 averaging 60.1
+
+<class '__main__.RANDOM'> and <class '__main__.PPO'> results:
+P1 won 5 averaging 53.6
+P2 won 4 averaging 53.3
+
+<class '__main__.RANDOM'> and <class '__main__.MCTS'> results:
+P1 won 5 averaging 51.3
+P2 won 5 averaging 59.1
+
+<class '__main__.RANDOM'> and <class '__main__.PPO'> results:
+P1 won 6 averaging 54.2
+P2 won 3 averaging 51.0
+
+<class '__main__.RANDOM'> and <class '__main__.MCTS'> results:
+P1 won 3 averaging 51.9
+P2 won 7 averaging 59.6
+
+<class '__main__.RANDOM'> and <class '__main__.PPO'> results:
+P1 won 7 averaging 54.9
+P2 won 3 averaging 47.5
+
+<class '__main__.RANDOM'> and <class '__main__.MCTS'> results:
+P1 won 3 averaging 49.4
+P2 won 7 averaging 57.6
+
+<class '__main__.RANDOM'> and <class '__main__.PPO'> results:
+P1 won 6 averaging 53.9
+P2 won 3 averaging 50.2
+
+<class '__main__.MINIMAX'> and <class '__main__.RANDOM'> results:
+P1 won 9 averaging 63.1
+P2 won 0 averaging 40.7
+
+<class '__main__.MINIMAX'> and <class '__main__.RANDOM'> results:
+P1 won 9 averaging 65.5
+P2 won 1 averaging 36.9
+
+<class '__main__.MINIMAX'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 63.2
+P2 won 0 averaging 36.7
+
+<class '__main__.MINIMAX'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 66.2
+P2 won 0 averaging 37.2
+
+<class '__main__.MINIMAX'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 70.0
+P2 won 10 averaging 71.0
+
+<class '__main__.MINIMAX'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 70.0
+P2 won 10 averaging 71.0
+
+<class '__main__.MINIMAX'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 70.0
+P2 won 10 averaging 71.0
+
+<class '__main__.MINIMAX'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 70.0
+P2 won 10 averaging 71.0
+
+<class '__main__.MINIMAX'> and <class '__main__.MCTS'> results:
+P1 won 9 averaging 64.8
+P2 won 1 averaging 45.6
+
+<class '__main__.MINIMAX'> and <class '__main__.MCTS'> results:
+P1 won 7 averaging 60.4
+P2 won 3 averaging 48.0
+
+<class '__main__.MINIMAX'> and <class '__main__.MCTS'> results:
+P1 won 9 averaging 65.1
+P2 won 1 averaging 45.8
+
+<class '__main__.MINIMAX'> and <class '__main__.MCTS'> results:
+P1 won 6 averaging 58.2
+P2 won 4 averaging 54.4
+
+<class '__main__.MINIMAX'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.0
+P2 won 0 averaging 46.0
+
+<class '__main__.MINIMAX'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.0
+P2 won 0 averaging 46.0
+
+<class '__main__.MINIMAX'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.0
+P2 won 0 averaging 46.0
+
+<class '__main__.MINIMAX'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.0
+P2 won 0 averaging 46.0
+
+<class '__main__.MCTS'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 65.9
+P2 won 0 averaging 48.2
+
+<class '__main__.MCTS'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 65.4
+P2 won 0 averaging 44.3
+
+<class '__main__.MCTS'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 66.2
+P2 won 0 averaging 48.4
+
+<class '__main__.MCTS'> and <class '__main__.RANDOM'> results:
+P1 won 10 averaging 65.9
+P2 won 0 averaging 47.8
+
+<class '__main__.MCTS'> and <class '__main__.MINIMAX'> results:
+P1 won 5 averaging 52.2
+P2 won 5 averaging 59.3
+
+<class '__main__.MCTS'> and <class '__main__.MINIMAX'> results:
+P1 won 4 averaging 55.5
+P2 won 6 averaging 61.5
+
+<class '__main__.MCTS'> and <class '__main__.MINIMAX'> results:
+P1 won 4 averaging 52.5
+P2 won 6 averaging 58.9
+
+<class '__main__.MCTS'> and <class '__main__.MINIMAX'> results:
+P1 won 7 averaging 65.8
+P2 won 3 averaging 62.4
+
+<class '__main__.MCTS'> and <class '__main__.MCTS'> results:
+P1 won 8 averaging 64.2
+P2 won 2 averaging 54.4
+
+<class '__main__.MCTS'> and <class '__main__.MCTS'> results:
+P1 won 7 averaging 59.9
+P2 won 3 averaging 56.2
+
+<class '__main__.MCTS'> and <class '__main__.MCTS'> results:
+P1 won 7 averaging 58.9
+P2 won 3 averaging 55.5
+
+<class '__main__.MCTS'> and <class '__main__.MCTS'> results:
+P1 won 7 averaging 62.9
+P2 won 3 averaging 57.8
+
+<class '__main__.MCTS'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 64.7
+P2 won 0 averaging 41.6
+
+<class '__main__.PPO'> and <class '__main__.RANDOM'> results:
+P1 won 4 averaging 55.2
+P2 won 6 averaging 55.0
+
+<class '__main__.MCTS'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.6
+P2 won 0 averaging 48.6
+
+<class '__main__.PPO'> and <class '__main__.RANDOM'> results:
+P1 won 7 averaging 56.5
+P2 won 3 averaging 55.5
+
+<class '__main__.PPO'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 33.0
+P2 won 10 averaging 65.0
+
+<class '__main__.MCTS'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 65.7
+P2 won 0 averaging 46.7
+
+<class '__main__.PPO'> and <class '__main__.RANDOM'> results:
+P1 won 7 averaging 58.6
+P2 won 3 averaging 55.0
+
+<class '__main__.PPO'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 33.0
+P2 won 10 averaging 65.0
+
+<class '__main__.PPO'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 33.0
+P2 won 10 averaging 65.0
+
+<class '__main__.MCTS'> and <class '__main__.PPO'> results:
+P1 won 10 averaging 66.2
+P2 won 0 averaging 48.2
+
+<class '__main__.PPO'> and <class '__main__.RANDOM'> results:
+P1 won 6 averaging 56.3
+P2 won 4 averaging 54.0
+
+<class '__main__.PPO'> and <class '__main__.MINIMAX'> results:
+P1 won 0 averaging 33.0
+P2 won 10 averaging 65.0
+
+<class '__main__.PPO'> and <class '__main__.MCTS'> results:
+P1 won 1 averaging 50.8
+P2 won 9 averaging 61.4
+
+<class '__main__.PPO'> and <class '__main__.PPO'> results:
+P1 won 0 averaging 52.0
+P2 won 10 averaging 59.0
+
+<class '__main__.PPO'> and <class '__main__.MCTS'> results:
+P1 won 3 averaging 53.7
+P2 won 7 averaging 58.5
+
+<class '__main__.PPO'> and <class '__main__.PPO'> results:
+P1 won 0 averaging 52.0
+P2 won 10 averaging 59.0
+
+<class '__main__.PPO'> and <class '__main__.MCTS'> results:
+P1 won 0 averaging 47.8
+P2 won 10 averaging 64.1
+
+<class '__main__.PPO'> and <class '__main__.PPO'> results:
+P1 won 0 averaging 52.0
+P2 won 10 averaging 59.0
+
+<class '__main__.PPO'> and <class '__main__.MCTS'> results:
+P1 won 1 averaging 49.3
+P2 won 9 averaging 59.8
+
+<class '__main__.PPO'> and <class '__main__.PPO'> results:
+P1 won 0 averaging 52.0
+P2 won 10 averaging 59.0
+
