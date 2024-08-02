@@ -34,7 +34,7 @@ def randWeights():
 for i in range(number_of_simulations):
   init_time = time.time()
   board = Board(14)  
-  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2] #, board.monte_carlo_turn]
+  player_types = [board.randomTurn, board.playSmart, board.playSmart_v2, board.monte_carlo_turn]
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',
