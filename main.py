@@ -85,6 +85,7 @@ while sim_num < number_of_simulations:
   # num_sims = [random.randint(400,420), random.randint(400,420)]  
   # num_sims = [random.randint(50,51), random.randint(50,51)]  # preforms suprisingly well even at 50. Getting beyond 1000 just takes too long
   player_types = [board.rand_monte_carlo_turn, board.playSmart_v2, board.monte_carlo_turn]
+
   convert_func_names = {
         board.playSmart_v2 : 'playSmart_v2',
         board.playSmart : 'playSmart_v1',

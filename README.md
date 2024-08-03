@@ -1,8 +1,9 @@
 # BlokusDuo
-### created by, Jake Frischmann, Delia Brown, Alden Bressler, Sebastian Liu, Etash Jhanji, Micheal Huang
+An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through gameplay optimization using Minimax algorithms.
+### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 The names and original orientations
-![image](pieces.png)
+[here](pieces_numbered.png)
 
  
 The reference sheet for the names, point count, corners and orientations of the blocks.
@@ -19,7 +20,6 @@ https://nikcheerla.github.io/deeplearningschool/2018/01/01/AlphaZero-Explained/
 ### Blokus Statistical Data spreadsheet
 https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
 
-
 ### To commit large data files:
  - git lfs
  - cd # type the location(folder) of the file here
@@ -31,3 +31,7 @@ https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxq
  - git add . (for all files), git add fileName.mp4 (for a single file)
  - git commit -m "add large files"
  - git push
+
+
+`aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower).
+
