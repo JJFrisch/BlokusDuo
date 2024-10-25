@@ -3,40 +3,21 @@ An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) t
 ### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 
-PGSS Project Paper
-https://tesdnet-my.sharepoint.com/:w:/g/personal/25frischmannj_tesdk12_net/Eaq9sagThWhFvesd_CqsRSwBd00tdYPEoN6t86uTtX1hGA?e=fx7OIc
+[PGSS Project Paper](https://tesdnet-my.sharepoint.com/:w:/g/personal/25frischmannj_tesdk12_net/Eaq9sagThWhFvesd_CqsRSwBd00tdYPEoN6t86uTtX1hGA?e=fx7OIc)
 
+## A Quick Abstract
 
+This research explores the application of various artificial intelligence algorithms to a two-player, abstract strategy board game Blokus Duo, evaluating the performance of models in different simulated environments. We implemented and tested several AI approaches, including Minimax (v3), Proximal Policy Optimization (PPO, v1), and Monte Carlo Tree Search (MCTS) with and without two convolutional neural networks (CNN) as evaluation and policy functions. Our primary objective was to compare the effectiveness of these algorithms in both human and non-human gameplay and identify trends in performance, particularly against human players. 
 
-The names and original orientations
-[here](pieces_numbered.png)
+We conducted over 2.5 million simulations across different model configurations, with random play serving as a baseline for performance evaluation. We found that Minimax, despite being a relatively simple algorithm, performed competitively in random agent simulations and showed a high win rate. In non-random matchups, Minimax and MCTS demonstrated superior performance, particularly in human play scenarios. MCTS, when augmented with CNNs, achieved the highest win rates overall, benefiting from the added complexity of the neural networks, and their ability to reduce the width and depth of search trees, which enabled more informed decision-making during play. The results suggest that MCTS, both with and without CNNs, can outperform experienced human players and other AI models, highlighting its effectiveness in strategic games like Blokus Duo. 
 
- 
-The reference sheet for the names, point count, corners and orientations of the blocks.
-https://docs.google.com/spreadsheets/d/1dFAExdQarvSGbGUxz0TBeIQ9M-47H39ZSjkkdOUDPpI/edit?gid=0#gid=0
-#### A deep explination of Alpha Zero
-https://nikcheerla.github.io/deeplearningschool/2018/01/01/AlphaZero-Explained/
+The PPO model, however, exhibited poor performance in matchups against more complex algorithms, likely due to insufficient training data and suboptimal hyperparameter tuning. Although it demonstrated strong results against random agents, its weaknesses were evident when facing experienced human players and more sophisticated AI. The deterministic nature of both PPO and Minimax prevented meaningful results when they were pitted against each other, leading to omitted data in this area. 
 
-#### For us to commit back to GitHub:
-* open a terminal from the folder BlokusDuo,
-* type in the terminal: git commit -a
-* write the information about the commit and close the tab
-* type in the terminal: git push
+Due to time constraints, certain comparisons, such as those involving PPO versus MCTS with CNN, could not be completed. However, based on similar trends observed in other matchups, we hypothesize that results would mirror those seen with MCTS alone, given the similar performance patterns of both models in comparable scenarios. 
 
-### Blokus Statistical Data spreadsheet
-https://docs.google.com/spreadsheets/d/1ivdX9h0s2E_GwyQ3qc64Rtgm8QBoLK1yau-i_zxqZCg/edit?usp=sharing
+The research concludes that MCTS, particularly when combined with CNNs, is the most effective algorithm tested for this strategic game. Future work will focus on refining code to reduce simulation runtime, experimenting with more sophisticated systems, and testing these advanced AI models against a broader pool of human players to validate their real-world applicability. 
 
-### To commit large data files:
- - git lfs
- - cd # type the location(folder) of the file here
- One of these, to follow a sinlge file, or a type of files
- - git lfs track "file name"
- - git lfs track "*.mp4"
-
- - git add .gitattributes
- - git add . (for all files), git add fileName.mp4 (for a single file)
- - git commit -m "add large files"
- - git push
+All code developed for this project is available on GitHub for further exploration and development. 
 
 
 `aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower).
