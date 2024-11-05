@@ -1,5 +1,5 @@
 # BlokusDuo
-An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through gameplay optimization using Minimax algorithms.
+An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) through various algorithms.
 ### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 
@@ -7,7 +7,7 @@ An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) t
 
 ## A Quick Abstract
 
-This research explores the application of various artificial intelligence algorithms to a two-player, abstract strategy board game Blokus Duo, evaluating the performance of models in different simulated environments. We implemented and tested several AI approaches, including Minimax (v3), Proximal Policy Optimization (PPO, v1), and Monte Carlo Tree Search (MCTS) with and without two convolutional neural networks (CNN) as evaluation and policy functions. Our primary objective was to compare the effectiveness of these algorithms in both human and non-human gameplay and identify trends in performance, particularly against human players. 
+This repository explores the application of various artificial intelligence algorithms to a two-player, abstract strategy board game Blokus Duo, evaluating the performance of models in different simulated environments. We implemented and tested several AI approaches, including Minimax (v3), Proximal Policy Optimization (PPO, v1), and Monte Carlo Tree Search (MCTS) with and without two convolutional neural networks (CNN) as evaluation and policy functions. Our primary objective was to compare the effectiveness of these algorithms in both human and non-human gameplay and identify trends in performance, particularly against human players. 
 
 We conducted over 2.5 million simulations across different model configurations, with random play serving as a baseline for performance evaluation. We found that Minimax, despite being a relatively simple algorithm, performed competitively in random agent simulations and showed a high win rate. In non-random matchups, Minimax and MCTS demonstrated superior performance, particularly in human play scenarios. MCTS, when augmented with CNNs, achieved the highest win rates overall, benefiting from the added complexity of the neural networks, and their ability to reduce the width and depth of search trees, which enabled more informed decision-making during play. The results suggest that MCTS, both with and without CNNs, can outperform experienced human players and other AI models, highlighting its effectiveness in strategic games like Blokus Duo. 
 
