@@ -19,6 +19,3 @@ The research concludes that MCTS, particularly when combined with CNNs, is the m
 
 All code developed for this project is available on GitHub for further exploration and development. 
 
-
-`aecTrain.py` and `aecView.py` are from https://pettingzoo.farama.org/tutorials/sb3/connect_four/ by Elliot (https://github.com/elliottower).
-
