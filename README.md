@@ -3,7 +3,7 @@ An exploration into the game of [Blokus](https://en.wikipedia.org/wiki/Blokus) t
 ### By Jake Frischmann, Etash Jhanji, Alden Bressler, Delia Brown, Micheal Huang, and Sebastian Liu
 
 
-[PGSS Project Paper]([https://tesdnet-my.sharepoint.com/:w:/g/personal/25frischmannj_tesdk12_net/Eaq9sagThWhFvesd_CqsRSwBd00tdYPEoN6t86uTtX1hGA?e=fx7OIc](https://docs.google.com/document/d/1t95HiT_Vk48AHe5BSArWpV6ObkvVYfmjIF5mwMdtEJw/edit?usp=sharing))
+[PGSS Project Paper]([https://tesdnet-my.sharepoint.com/:w:/g/personal/25frischmannj_tesdk12_net/Eaq9sagThWhFvesd_CqsRSwBd00tdYPEoN6t86uTtX1hGA?e=fx7OIc](https://docs.google.com/document/d/1t95HiT_Vk48AHe5BSArWpV6ObkvVYfmjIF5mwMdtEJw/edit?usp=sharing)
 
 ## A Quick Abstract
 
